@@ -6,13 +6,10 @@ so tests never touch the real ~/.mempalace or ~/.recallos directories.
 """
 
 import json
-import shutil
 import sqlite3
-import tempfile
 from pathlib import Path
 from unittest.mock import patch
 
-import pytest
 
 import recallos.migration as migration_module
 from recallos.migration import (

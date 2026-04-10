@@ -15,12 +15,10 @@ Strategy:
 import json
 import os
 import sqlite3
-import tempfile
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import chromadb
-import pytest
 
 from recallos.config import RecallOSConfig
 from recallos.diagnostics import (

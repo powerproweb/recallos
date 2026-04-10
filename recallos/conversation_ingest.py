@@ -15,6 +15,8 @@ from pathlib import Path
 from datetime import datetime
 from collections import defaultdict
 
+import re as _re
+
 import chromadb
 
 from .normalize import normalize
@@ -242,8 +244,6 @@ TOPIC_BIGRAMS = {
         "workaround for",
     ],
 }
-
-import re as _re
 
 
 def _normalize_text(text: str) -> str:

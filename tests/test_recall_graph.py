@@ -6,7 +6,6 @@ the real ~/.recallos/recall_graph.sqlite3.
 """
 
 import json
-from pathlib import Path
 
 import pytest
 

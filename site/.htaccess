@@ -1,0 +1,347 @@
+# ============================================================================
+# RecallOS Landing Page — .htaccess
+# Production-ready Apache configuration
+# Last updated: 2026-04-10
+# ============================================================================
+
+
+# ----------------------------------------------------------------------------
+# 1. CORE ENGINE
+# ----------------------------------------------------------------------------
+RewriteEngine On
+Options -Indexes -MultiViews +FollowSymLinks
+ServerSignature Off
+
+
+# ----------------------------------------------------------------------------
+# 2. HTTPS REDIRECT (force SSL on all requests)
+# ----------------------------------------------------------------------------
+RewriteCond %{HTTPS} !=on
+RewriteCond %{HTTP:X-Forwarded-Proto} !https
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+
+# ----------------------------------------------------------------------------
+# 3. WWW → NON-WWW CANONICAL (adjust if you prefer www)
+# ----------------------------------------------------------------------------
+RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+RewriteRule ^ https://%1%{REQUEST_URI} [L,R=301]
+
+
+# ----------------------------------------------------------------------------
+# 4. SECURITY HEADERS
+# ----------------------------------------------------------------------------
+<IfModule mod_headers.c>
+    # Strict Transport Security — enforce HTTPS for 1 year + subdomains
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" env=HTTPS
+
+    # Prevent MIME-type sniffing
+    Header always set X-Content-Type-Options "nosniff"
+
+    # Clickjacking protection
+    Header always set X-Frame-Options "SAMEORIGIN"
+
+    # XSS filter (legacy browsers)
+    Header always set X-XSS-Protection "1; mode=block"
+
+    # Referrer policy — send origin only on cross-origin, full on same-origin
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+    # Permissions policy — disable unused browser features
+    Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()"
+
+    # Content Security Policy
+    # Allows: self, Google Fonts (CSS + woff2), shields.io badges, inline styles for animations
+    Header always set Content-Security-Policy "\
+        default-src 'self'; \
+        script-src 'self'; \
+        style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; \
+        font-src 'self' https://fonts.gstatic.com; \
+        img-src 'self' https://img.shields.io https://badge.fury.io data:; \
+        connect-src 'self'; \
+        frame-ancestors 'self'; \
+        base-uri 'self'; \
+        form-action 'self'; \
+        upgrade-insecure-requests"
+
+    # Prevent browsers from caching sensitive headers
+    Header always set X-Permitted-Cross-Domain-Policies "none"
+
+    # Remove server-identifying headers
+    Header unset X-Powered-By
+    Header unset Server
+</IfModule>
+
+
+# ----------------------------------------------------------------------------
+# 5. CORS — allow badge / font CDN requests
+# ----------------------------------------------------------------------------
+<IfModule mod_headers.c>
+    <FilesMatch "\.(woff2?|ttf|otf|eot|svg)$">
+        Header set Access-Control-Allow-Origin "*"
+    </FilesMatch>
+</IfModule>
+
+
+# ----------------------------------------------------------------------------
+# 6. GZIP / BROTLI COMPRESSION
+# ----------------------------------------------------------------------------
+
+# Brotli (preferred, if mod_brotli is available)
+<IfModule mod_brotli.c>
+    AddOutputFilterByType BROTLI_COMPRESS text/html text/plain text/css
+    AddOutputFilterByType BROTLI_COMPRESS text/javascript application/javascript application/json
+    AddOutputFilterByType BROTLI_COMPRESS text/xml application/xml application/xhtml+xml
+    AddOutputFilterByType BROTLI_COMPRESS image/svg+xml application/font-woff2
+</IfModule>
+
+# Gzip fallback
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/css
+    AddOutputFilterByType DEFLATE text/javascript application/javascript application/json
+    AddOutputFilterByType DEFLATE text/xml application/xml application/xhtml+xml application/rss+xml
+    AddOutputFilterByType DEFLATE image/svg+xml
+    AddOutputFilterByType DEFLATE application/font-woff application/font-woff2
+    AddOutputFilterByType DEFLATE application/vnd.ms-fontobject
+    AddOutputFilterByType DEFLATE application/x-font-ttf
+
+    # Don't compress already-compressed files
+    SetEnvIfNoCase Request_URI \.(?:gif|jpe?g|png|webp|avif|ico|zip|gz|bz2|rar|7z|mp4|webm|woff2)$ no-gzip
+</IfModule>
+
+
+# ----------------------------------------------------------------------------
+# 7. BROWSER CACHING — Cache-Control + Expires
+# ----------------------------------------------------------------------------
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresDefault                          "access plus 1 month"
+
+    # HTML — short cache (content changes)
+    ExpiresByType text/html                 "access plus 1 hour"
+
+    # CSS & JS — long cache (fingerprinted filenames recommended)
+    ExpiresByType text/css                  "access plus 1 year"
+    ExpiresByType text/javascript           "access plus 1 year"
+    ExpiresByType application/javascript    "access plus 1 year"
+
+    # Images
+    ExpiresByType image/jpeg                "access plus 1 year"
+    ExpiresByType image/png                 "access plus 1 year"
+    ExpiresByType image/gif                 "access plus 1 year"
+    ExpiresByType image/webp                "access plus 1 year"
+    ExpiresByType image/avif                "access plus 1 year"
+    ExpiresByType image/svg+xml             "access plus 1 year"
+    ExpiresByType image/x-icon              "access plus 1 year"
+
+    # Fonts
+    ExpiresByType font/woff                 "access plus 1 year"
+    ExpiresByType font/woff2                "access plus 1 year"
+    ExpiresByType application/font-woff     "access plus 1 year"
+    ExpiresByType application/font-woff2    "access plus 1 year"
+
+    # Data
+    ExpiresByType application/json          "access plus 0 seconds"
+    ExpiresByType text/xml                  "access plus 0 seconds"
+    ExpiresByType application/xml           "access plus 0 seconds"
+</IfModule>
+
+# Cache-Control headers for static assets
+<IfModule mod_headers.c>
+    <FilesMatch "\.(css|js)$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
+    <FilesMatch "\.(jpe?g|png|gif|webp|avif|svg|ico)$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
+    <FilesMatch "\.(woff2?|ttf|otf|eot)$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
+    <FilesMatch "\.(html|htm)$">
+        Header set Cache-Control "public, max-age=3600, must-revalidate"
+    </FilesMatch>
+</IfModule>
+
+
+# ----------------------------------------------------------------------------
+# 8. ETAG CONFIGURATION
+# ----------------------------------------------------------------------------
+# Remove ETags for static assets (Cache-Control + Expires is sufficient)
+<IfModule mod_headers.c>
+    Header unset ETag
+</IfModule>
+FileETag None
+
+
+# ----------------------------------------------------------------------------
+# 9. MIME TYPES
+# ----------------------------------------------------------------------------
+<IfModule mod_mime.c>
+    AddType text/html                 .html .htm
+    AddType text/css                  .css
+    AddType text/javascript           .js .mjs
+    AddType application/json          .json
+    AddType application/xml           .xml
+    AddType image/svg+xml             .svg .svgz
+    AddType image/webp                .webp
+    AddType image/avif                .avif
+    AddType font/woff                 .woff
+    AddType font/woff2                .woff2
+    AddType application/manifest+json .webmanifest
+    AddType text/plain                .txt
+    AddType text/markdown             .md
+
+    # Correct encoding for compressed SVG
+    AddEncoding gzip svgz
+</IfModule>
+
+# UTF-8 charset for text files
+AddDefaultCharset utf-8
+<IfModule mod_mime.c>
+    AddCharset utf-8 .html .htm .css .js .json .xml .svg .txt .md .webmanifest
+</IfModule>
+
+
+# ----------------------------------------------------------------------------
+# 10. CLEAN URLS — serve .html without extension
+# ----------------------------------------------------------------------------
+# /features → /features.html
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}.html -f
+RewriteRule ^(.+)$ $1.html [L]
+
+# Remove trailing slash (except root)
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)/$ /$1 [L,R=301]
+
+# Remove .html extension from URLs (redirect to clean version)
+RewriteCond %{THE_REQUEST} \s/+(.+?)\.html[\s?] [NC]
+RewriteRule ^ /%1 [L,R=301,NE]
+
+
+# ----------------------------------------------------------------------------
+# 11. ERROR PAGES
+# ----------------------------------------------------------------------------
+ErrorDocument 400 /errors/400.html
+ErrorDocument 401 /errors/401.html
+ErrorDocument 403 /errors/403.html
+ErrorDocument 404 /errors/404.html
+ErrorDocument 500 /errors/500.html
+ErrorDocument 503 /errors/503.html
+
+
+# ----------------------------------------------------------------------------
+# 12. SENSITIVE FILE PROTECTION
+# ----------------------------------------------------------------------------
+# Block access to hidden files and directories (.git, .env, .htaccess, etc.)
+<IfModule mod_rewrite.c>
+    RewriteRule (^|/)\.(?!well-known/) - [F]
+</IfModule>
+
+# Block access to sensitive file extensions
+<FilesMatch "\.(bak|backup|sql|sqlite3?|log|ini|conf|env|yml|yaml|toml|lock|py|pyc|sh|bat|ps1|md)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# Explicitly protect critical files
+<FilesMatch "^(\.htaccess|\.htpasswd|\.gitignore|\.git|composer\.json|package\.json|pyproject\.toml|requirements\.txt|recallos\.yaml|entities\.json)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+</FilesMatch>
+
+# Allow robots.txt and sitemap.xml
+<FilesMatch "^(robots\.txt|sitemap\.xml)$">
+    <IfModule mod_authz_core.c>
+        Require all granted
+    </IfModule>
+</FilesMatch>
+
+
+# ----------------------------------------------------------------------------
+# 13. HOTLINK PROTECTION — prevent other sites from embedding your images
+# ----------------------------------------------------------------------------
+<IfModule mod_rewrite.c>
+    RewriteCond %{HTTP_REFERER} !^$ [NC]
+    RewriteCond %{HTTP_REFERER} !^https?://(www\.)?recallos\.(dev|io|com) [NC]
+    RewriteCond %{HTTP_REFERER} !^https?://(www\.)?google\. [NC]
+    RewriteCond %{HTTP_REFERER} !^https?://(www\.)?github\.com [NC]
+    RewriteCond %{HTTP_REFERER} !^https?://(www\.)?pypi\.org [NC]
+    RewriteRule \.(jpe?g|png|gif|webp|avif|svg)$ - [F,NC]
+</IfModule>
+
+
+# ----------------------------------------------------------------------------
+# 14. BAD BOT BLOCKING
+# ----------------------------------------------------------------------------
+<IfModule mod_rewrite.c>
+    RewriteCond %{HTTP_USER_AGENT} (AhrefsBot|SemrushBot|MJ12bot|DotBot|BLEXBot|PetalBot|YandexBot|Bytespider|GPTBot|CCBot|ClaudeBot|anthropic-ai|ia_archiver|Scrapy|wget|curl) [NC]
+    RewriteRule .* - [F,L]
+</IfModule>
+
+# Block empty user agents
+<IfModule mod_rewrite.c>
+    RewriteCond %{HTTP_USER_AGENT} ^$ [NC]
+    RewriteRule .* - [F,L]
+</IfModule>
+
+
+# ----------------------------------------------------------------------------
+# 15. REQUEST SIZE LIMITS — prevent abuse
+# ----------------------------------------------------------------------------
+<IfModule mod_rewrite.c>
+    # Block suspiciously long URLs (>2048 chars)
+    RewriteCond %{THE_REQUEST} ^.{2049,}
+    RewriteRule .* - [F]
+</IfModule>
+
+# Limit upload size (not needed for static site, but safe default)
+LimitRequestBody 1048576
+
+
+# ----------------------------------------------------------------------------
+# 16. PREVENT COMMON EXPLOITS
+# ----------------------------------------------------------------------------
+<IfModule mod_rewrite.c>
+    # Block SQL injection attempts in query strings
+    RewriteCond %{QUERY_STRING} (union|select|insert|drop|delete|update|concat|char|hex) [NC,OR]
+    RewriteCond %{QUERY_STRING} (\<|%3C).*script.*(\>|%3E) [NC,OR]
+    RewriteCond %{QUERY_STRING} (\.\./){2,} [NC,OR]
+    RewriteCond %{QUERY_STRING} (boot\.ini|etc/passwd|self/environ) [NC,OR]
+    RewriteCond %{QUERY_STRING} (thumbs?\.db|\.htaccess|\.htpasswd|\.DS_Store) [NC]
+    RewriteRule .* - [F,L]
+</IfModule>
+
+
+# ----------------------------------------------------------------------------
+# 17. RATE LIMITING (basic — requires mod_evasive or mod_qos for full control)
+# ----------------------------------------------------------------------------
+# If mod_evasive is available:
+# <IfModule mod_evasive20.c>
+#     DOSHashTableSize    3097
+#     DOSPageCount        5
+#     DOSSiteCount        50
+#     DOSPageInterval     1
+#     DOSSiteInterval     1
+#     DOSBlockingPeriod   60
+# </IfModule>
+
+
+# ----------------------------------------------------------------------------
+# 18. PERFORMANCE — keep-alive connections
+# ----------------------------------------------------------------------------
+<IfModule mod_headers.c>
+    Header set Connection keep-alive
+</IfModule>
+
+
+# ============================================================================
+# END — RecallOS Landing Page .htaccess
+# ============================================================================

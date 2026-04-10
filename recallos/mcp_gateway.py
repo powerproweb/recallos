@@ -28,6 +28,7 @@ from .retrieval_engine import search_memories
 from .vault_graph import traverse, find_links, graph_stats
 import chromadb
 
+from .agent_log import AgentLog
 from .recall_graph import RecallGraph
 
 _rg = RecallGraph()
@@ -369,8 +370,6 @@ def tool_graph_stats():
 
 
 # ==================== AGENT LOG ====================
-
-from .agent_log import AgentLog
 
 
 def tool_log_write(agent_name: str, entry: str, topic: str = "general"):

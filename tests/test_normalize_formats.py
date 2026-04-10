@@ -7,9 +7,6 @@ the public normalize() entry point to verify end-to-end routing.
 """
 
 import json
-import os
-import tempfile
-from pathlib import Path
 
 from recallos.normalize import (
     _normalize_obsidian_note,

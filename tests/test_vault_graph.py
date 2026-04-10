@@ -10,7 +10,6 @@ import shutil
 import tempfile
 
 import chromadb
-import pytest
 
 from recallos.vault_graph import (
     _fuzzy_match,
@@ -222,9 +221,9 @@ def test_find_links_returns_multi_domain_nodes():
         {"id": "r3", "doc": "z", "meta": {"node": "billing", "domain": "proj_a", "channel": ""}},
     ])
     links = find_links(col=col)
-    link_nodes = [l["node"] for l in links]
+    link_nodes = [lnk["node"] for lnk in links]
     assert "auth" in link_nodes
-    assert "billing" not in link_nodes  # only one domain
+    assert "billing" not in link_nodes
     _cleanup(client, tmpdir)
 
 
@@ -237,7 +236,7 @@ def test_find_links_domain_filter():
         {"id": "r4", "doc": "w", "meta": {"node": "cache",  "domain": "proj_c", "channel": ""}},
     ])
     links_a = find_links(domain_a="proj_a", col=col)
-    link_nodes_a = [l["node"] for l in links_a]
+    link_nodes_a = [lnk["node"] for lnk in links_a]
     assert "auth" in link_nodes_a
     assert "cache" not in link_nodes_a  # proj_c, not proj_a
     _cleanup(client, tmpdir)
@@ -252,7 +251,7 @@ def test_find_links_both_domain_filter():
         {"id": "r4", "doc": "w", "meta": {"node": "cache", "domain": "proj_c", "channel": ""}},
     ])
     links = find_links(domain_a="proj_a", domain_b="proj_b", col=col)
-    link_nodes = [l["node"] for l in links]
+    link_nodes = [lnk["node"] for lnk in links]
     assert "auth" in link_nodes   # in both proj_a and proj_b
     assert "cache" not in link_nodes  # proj_a + proj_c, not proj_b
     _cleanup(client, tmpdir)
