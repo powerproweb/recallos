@@ -27,7 +27,7 @@ Most memory systems try to solve this by deciding what is worth remembering. The
 
 <br>
 
-[Quick Start](#quick-start) · [The Data Vault](#the-data-vault) · [RecallScript Compression](#recallscript-compression) · [Benchmarks](#benchmarks) · [MCP Tools](#mcp-server)
+[Quick Start](#quick-start) · [The Data Vault](#the-data-vault) · [RecallScript Compression](#recallscript-compression) · [Benchmarks](#benchmarks) · [MCP Tools](#mcp-server) · [Feature List](ReCallOS.features.readme.md) · [User Guide](ReCallOS.user-benefits.readme.md)
 
 <br>
 
@@ -45,6 +45,15 @@ Most memory systems try to solve this by deciding what is worth remembering. The
 <sub>Reproducible — runners in <a href="benchmarks/">benchmarks/</a>. <a href="benchmarks/BENCHMARKS.md">Full results</a>.</sub>
 
 </div>
+
+---
+
+## Documentation
+
+| Document | Description |
+|----------|-------------|
+| [ReCallOS.features.readme.md](ReCallOS.features.readme.md) | Complete technical feature list — every capability, flag, API method, and configuration option |
+| [ReCallOS.user-benefits.readme.md](ReCallOS.user-benefits.readme.md) | Plain-English guide — what RecallOS does for you, use cases, and getting started |
 
 ---
 
