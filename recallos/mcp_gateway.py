@@ -317,9 +317,34 @@ def tool_graph_add(
 ):
     """Add a relationship to the knowledge graph."""
     triple_id = _rg.add_triple(
-        subject, predicate, object, valid_from=valid_from, source_closet=source_record
+        subject, predicate, object, valid_from=valid_from, source_index=source_record
     )
     return {"success": True, "triple_id": triple_id, "fact": f"{subject} → {predicate} → {object}"}
+
+
+def tool_graph_path(entity_a: str, entity_b: str, max_depth: int = 4):
+    """Find the shortest relationship path between two entities in the knowledge graph."""
+    path = _rg.find_path(entity_a, entity_b, max_depth=max_depth)
+    if path is None:
+        return {
+            "entity_a": entity_a,
+            "entity_b": entity_b,
+            "path": None,
+            "message": f"No path found between '{entity_a}' and '{entity_b}' within {max_depth} hops.",
+        }
+    if path == []:
+        return {
+            "entity_a": entity_a,
+            "entity_b": entity_b,
+            "path": [],
+            "message": "Same entity.",
+        }
+    return {
+        "entity_a": entity_a,
+        "entity_b": entity_b,
+        "hops": len(path),
+        "path": path,
+    }
 
 
 def tool_graph_invalidate(subject: str, predicate: str, object: str, ended: str = None):
@@ -345,95 +370,82 @@ def tool_graph_stats():
 
 # ==================== AGENT LOG ====================
 
+from .agent_log import AgentLog
+
 
 def tool_log_write(agent_name: str, entry: str, topic: str = "general"):
     """
-    Write an agent log entry. Each agent gets its own domain
-    with a log node. Entries are timestamped and accumulate over time.
-
-    This is the agent's personal journal — observations, thoughts,
-    what it worked on, what it noticed, what it thinks matters.
+    Write an agent log entry. Persisted to file (~/.recallos/agent_logs/)
+    and ChromaDB. This is the agent's personal journal.
     """
-    domain = f"domain_{agent_name.lower().replace(' ', '_')}"
-    node = "agent_log"
-    col = _get_collection(create=True)
-    if not col:
-        return _no_vault()
-
-    now = datetime.now()
-    entry_id = f"log_{domain}_{now.strftime('%Y%m%d_%H%M%S')}_{hashlib.md5(entry[:50].encode()).hexdigest()[:8]}"
-
-    try:
-        col.add(
-            ids=[entry_id],
-            documents=[entry],
-            metadatas=[
-                {
-                    "domain": domain,
-                    "node": node,
-                    "channel": "channel_facts",
-                    "topic": topic,
-                    "type": "agent_log_entry",
-                    "agent": agent_name,
-                    "filed_at": now.isoformat(),
-                    "date": now.strftime("%Y-%m-%d"),
-                }
-            ],
-        )
-        logger.info(f"Log entry: {entry_id} → {domain}/agent_log/{topic}")
-        return {
-            "success": True,
-            "entry_id": entry_id,
-            "agent": agent_name,
-            "topic": topic,
-            "timestamp": now.isoformat(),
-        }
-    except Exception as e:
-        return {"success": False, "error": str(e)}
+    log = AgentLog(agent_name, vault_path=_config.vault_path)
+    result = log.write(content=entry, topic=topic)
+    logger.info(f"Log entry: {result['entry_id']} (file: {result['file']})")
+    return {
+        "success": True,
+        "entry_id": result["entry_id"],
+        "agent": agent_name,
+        "topic": topic,
+        "timestamp": result["timestamp"],
+        "file": result["file"],
+    }
 
 
 def tool_log_read(agent_name: str, last_n: int = 10):
     """
-    Read an agent's recent log entries. Returns the last N entries
-    in chronological order — the agent's personal journal.
+    Read an agent's recent log entries (file-backed, newest first).
+    Falls back to ChromaDB if no file logs exist.
     """
-    domain = f"domain_{agent_name.lower().replace(' ', '_')}"
-    col = _get_collection()
-    if not col:
-        return _no_vault()
+    log = AgentLog(agent_name, vault_path=_config.vault_path)
+    entries = log.read(last_n=last_n)
 
-    try:
-        results = col.get(
-            where={"$and": [{"domain": domain}, {"node": "agent_log"}]},
-            include=["documents", "metadatas"],
-        )
+    # Fall back to ChromaDB if no file entries exist
+    if not entries:
+        col = _get_collection()
+        if col:
+            domain = f"domain_{agent_name.lower().replace(' ', '_')}"
+            try:
+                results = col.get(
+                    where={"$and": [{"domain": domain}, {"node": "agent_log"}]},
+                    include=["documents", "metadatas"],
+                )
+                for doc, meta in zip(results.get("documents", []), results.get("metadatas", [])):
+                    entries.append({
+                        "date": meta.get("date", ""),
+                        "timestamp": meta.get("filed_at", ""),
+                        "topic": meta.get("topic", ""),
+                        "content": doc,
+                    })
+                entries.sort(key=lambda x: x["timestamp"], reverse=True)
+                entries = entries[:last_n]
+            except Exception:
+                pass
 
-        if not results["ids"]:
-            return {"agent": agent_name, "entries": [], "message": "No log entries yet."}
+    if not entries:
+        return {"agent": agent_name, "entries": [], "message": "No log entries yet."}
 
-        # Combine and sort by timestamp
-        entries = []
-        for doc, meta in zip(results["documents"], results["metadatas"]):
-            entries.append(
-                {
-                    "date": meta.get("date", ""),
-                    "timestamp": meta.get("filed_at", ""),
-                    "topic": meta.get("topic", ""),
-                    "content": doc,
-                }
-            )
+    stats = log.stats()
+    return {
+        "agent": agent_name,
+        "entries": entries,
+        "total_on_file": stats["total_entries"],
+        "showing": len(entries),
+    }
 
-        entries.sort(key=lambda x: x["timestamp"], reverse=True)
-        entries = entries[:last_n]
 
-        return {
-            "agent": agent_name,
-            "entries": entries,
-            "total": len(results["ids"]),
-            "showing": len(entries),
-        }
-    except Exception as e:
-        return {"error": str(e)}
+def tool_log_search(agent_name: str, keyword: str, max_results: int = 20):
+    """
+    Keyword search across an agent's file-backed log entries.
+    Case-insensitive. Searches all days of logs.
+    """
+    log = AgentLog(agent_name)
+    matches = log.search(keyword, max_results=max_results)
+    return {
+        "agent": agent_name,
+        "keyword": keyword,
+        "matches": matches,
+        "count": len(matches),
+    }
 
 
 # ==================== MCP PROTOCOL ====================
@@ -549,6 +561,22 @@ TOOLS = {
         "description": "Knowledge graph overview: entities, triples, current vs expired facts, relationship types.",
         "input_schema": {"type": "object", "properties": {}},
         "handler": tool_graph_stats,
+    },
+    "recallos_graph_path": {
+        "description": "Find the shortest relationship path between two entities in the knowledge graph. E.g. how is 'Max' connected to 'Chess'? Returns each hop as subject → predicate → object.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "entity_a": {"type": "string", "description": "Starting entity"},
+                "entity_b": {"type": "string", "description": "Target entity"},
+                "max_depth": {
+                    "type": "integer",
+                    "description": "Max hops to search (default: 4)",
+                },
+            },
+            "required": ["entity_a", "entity_b"],
+        },
+        "handler": tool_graph_path,
     },
     "recallos_traverse_links": {
         "description": "Walk the vault graph from a node. Shows connected ideas across domains — the links. Like following a thread: start at 'chromadb-setup' in domain_code, discover it connects to domain_myproject (planning) and domain_user (feelings about it).",
@@ -684,6 +712,28 @@ TOOLS = {
             "required": ["agent_name"],
         },
         "handler": tool_log_read,
+    },
+    "recallos_log_search": {
+        "description": "Keyword search across your agent log history. Case-insensitive grep across all days of recorded entries.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "agent_name": {
+                    "type": "string",
+                    "description": "Your name",
+                },
+                "keyword": {
+                    "type": "string",
+                    "description": "Word or phrase to search for in your log history",
+                },
+                "max_results": {
+                    "type": "integer",
+                    "description": "Max matching entries to return (default: 20)",
+                },
+            },
+            "required": ["agent_name", "keyword"],
+        },
+        "handler": tool_log_search,
     },
 }
 

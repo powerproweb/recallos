@@ -23,6 +23,7 @@ def normalize(filepath: str) -> str:
     """
     Load a file and normalize to transcript format if it's a chat export.
     Plain text files pass through unchanged.
+    Obsidian markdown notes have frontmatter stripped and wikilinks converted.
     """
     try:
         with open(filepath, "r", encoding="utf-8", errors="replace") as f:
@@ -33,7 +34,7 @@ def normalize(filepath: str) -> str:
     if not content.strip():
         return content
 
-    # Already has > markers â€” pass through
+    # Already has > markers — pass through
     lines = content.split("\n")
     if sum(1 for line in lines if line.strip().startswith(">")) >= 3:
         return content
@@ -44,6 +45,10 @@ def normalize(filepath: str) -> str:
         normalized = _try_normalize_json(content)
         if normalized:
             return normalized
+
+    # Obsidian vault notes (.md with YAML frontmatter)
+    if ext == ".md" and content.strip().startswith("---"):
+        return _normalize_obsidian_note(content)
 
     return content
 
@@ -60,7 +65,7 @@ def _try_normalize_json(content: str) -> Optional[str]:
     except json.JSONDecodeError:
         return None
 
-    for parser in (_try_claude_ai_json, _try_chatgpt_json, _try_slack_json):
+    for parser in (_try_claude_ai_json, _try_chatgpt_json, _try_slack_json, _try_discord_json):
         normalized = parser(data)
         if normalized:
             return normalized
@@ -236,6 +241,87 @@ def _messages_to_transcript(messages: list, spellcheck: bool = True) -> str:
             i += 1
         lines.append("")
     return "\n".join(lines)
+
+
+def _try_discord_json(data) -> Optional[str]:
+    """
+    Discord channel export (e.g. from DiscordChatExporter).
+
+    Supports two common schemas:
+    1. Array of message objects:
+       [{"id": "...", "type": "Default", "content": "...",
+         "author": {"name": "...", "username": "..."}, "timestamp": "..."}]
+    2. Wrapped format:
+       {"messages": [...]}
+    """
+    if isinstance(data, dict):
+        data = data.get("messages", [])
+    if not isinstance(data, list):
+        return None
+
+    # Must look like Discord: objects with "content" + "author" + "id" keys
+    if not data or not isinstance(data[0], dict):
+        return None
+    sample = data[0]
+    if not ("content" in sample and "author" in sample):
+        return None
+    # Distinguish from Slack which has "type": "message"
+    if sample.get("type") == "message" and "user" in sample:
+        return None  # Slack — handled by _try_slack_json
+
+    # Map authors to user/assistant alternating roles
+    messages = []
+    seen_authors: dict = {}
+    last_role = None
+    for item in data:
+        if not isinstance(item, dict):
+            continue
+        # Skip system messages and non-Default types
+        msg_type = str(item.get("type", "Default"))
+        if msg_type not in ("Default", "0", "default"):
+            continue
+        text = item.get("content", "").strip()
+        if not text:
+            continue
+        author = item.get("author", {})
+        author_id = author.get("id") or author.get("username") or author.get("name", "")
+        if not author_id:
+            continue
+        if author_id not in seen_authors:
+            if not seen_authors:
+                seen_authors[author_id] = "user"
+            elif last_role == "user":
+                seen_authors[author_id] = "assistant"
+            else:
+                seen_authors[author_id] = "user"
+        last_role = seen_authors[author_id]
+        messages.append((seen_authors[author_id], text))
+
+    if len(messages) >= 2:
+        return _messages_to_transcript(messages)
+    return None
+
+
+def _normalize_obsidian_note(content: str) -> str:
+    """
+    Normalize an Obsidian vault note:
+    - Strip YAML frontmatter (between leading --- delimiters)
+    - Convert wikilinks [[Target]] → Target
+    - Convert wikilinks with aliases [[Target|Alias]] → Alias
+
+    Returns the cleaned markdown body, unchanged if it has no frontmatter.
+    """
+    import re
+
+    # Strip YAML frontmatter: must start with ---\n ... ---\n
+    fm_pattern = re.compile(r"^---\s*\n.*?\n---\s*\n", re.DOTALL)
+    content = fm_pattern.sub("", content, count=1).lstrip()
+
+    # Convert [[wikilinks]] and [[wikilinks|aliases]]
+    content = re.sub(r"\[\[([^|\]]+)\|([^\]]+)\]\]", r"\2", content)  # [[target|alias]] → alias
+    content = re.sub(r"\[\[([^\]]+)\]\]", r"\1", content)              # [[target]] → target
+
+    return content.strip()
 
 
 if __name__ == "__main__":

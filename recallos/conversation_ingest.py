@@ -190,15 +190,95 @@ TOPIC_KEYWORDS = {
     ],
 }
 
+# Bigram patterns — multi-word signals that strongly indicate a topic
+TOPIC_BIGRAMS = {
+    "technical": [
+        "pull request",
+        "stack trace",
+        "type error",
+        "import error",
+        "runtime error",
+        "unit test",
+        "end to end",
+        "rest api",
+        "async await",
+        "npm install",
+        "pip install",
+        "docker compose",
+    ],
+    "architecture": [
+        "data model",
+        "design pattern",
+        "system design",
+        "domain model",
+        "event driven",
+        "micro service",
+        "api gateway",
+    ],
+    "planning": [
+        "next steps",
+        "action item",
+        "release date",
+        "launch date",
+        "project plan",
+        "quarterly goal",
+        "user story",
+    ],
+    "decisions": [
+        "we decided",
+        "final decision",
+        "going with",
+        "trade off",
+        "chose to",
+        "switched to",
+        "moved to",
+    ],
+    "problems": [
+        "not working",
+        "keeps failing",
+        "root cause",
+        "known issue",
+        "temporary fix",
+        "workaround for",
+    ],
+}
+
+import re as _re
+
+
+def _normalize_text(text: str) -> str:
+    """Lowercase, collapse whitespace, strip leading punctuation."""
+    text = text.lower()
+    text = _re.sub(r"[^\w\s]", " ", text)  # replace punctuation with spaces
+    text = _re.sub(r"\s+", " ", text).strip()
+    return text
+
 
 def detect_convo_node(content: str) -> str:
-    """Score conversation content against topic keywords."""
-    content_lower = content[:3000].lower()
-    scores = {}
+    """Score conversation content against topic keywords and bigrams.
+
+    Matches in the first 500 chars (title/lead) receive 2x weight.
+    Bigram matches count as 2 keyword matches each.
+    """
+    lead = _normalize_text(content[:500])
+    body = _normalize_text(content[:3000])
+
+    scores: dict = {}
     for node_name, keywords in TOPIC_KEYWORDS.items():
-        score = sum(1 for kw in keywords if kw in content_lower)
+        score = 0
+        for kw in keywords:
+            if kw in body:
+                score += 1
+            if kw in lead:
+                score += 1  # extra weight for lead matches
+        for bigram in TOPIC_BIGRAMS.get(node_name, []):
+            if bigram in body:
+                score += 2
+            if bigram in lead:
+                score += 2  # extra weight for lead bigram matches
         if score > 0:
             scores[node_name] = score
+
     if scores:
         return max(scores, key=scores.get)
     return "general"
@@ -258,6 +338,7 @@ def mine_convos(
     limit: int = 0,
     dry_run: bool = False,
     extract_mode: str = "exchange",
+    encode: bool = False,
 ):
     """Ingest a directory of conversation files into the Data Vault.
 
@@ -286,6 +367,17 @@ def mine_convos(
     print(f"{'Ã¢â€â‚¬' * 55}\n")
 
     collection = get_collection(vault_path) if not dry_run else None
+    encoded_collection = None
+    dialect = None
+    if encode and not dry_run:
+        import chromadb as _chromadb
+        _enc_client = _chromadb.PersistentClient(path=vault_path)
+        encoded_collection = _enc_client.get_or_create_collection("recallos_encoded")
+        try:
+            from .recallscript import Dialect
+            dialect = Dialect()
+        except Exception:
+            dialect = None
 
     # Pre-load already-mined files in one query (avoids O(n) scan per file)
     mined_files = get_mined_files(collection, domain) if not dry_run else set()
@@ -388,8 +480,32 @@ def mine_convos(
                     if "already exists" not in str(e).lower():
                         raise
 
+        # Also store RecallScript-encoded versions if requested
+        if dialect and encoded_collection and batch_docs:
+            enc_batch_docs, enc_batch_ids, enc_batch_metas = [], [], []
+            for doc, rec_id, meta in zip(batch_docs, batch_ids, batch_metas):
+                try:
+                    compressed = dialect.compress(doc, metadata=meta)
+                    stats = dialect.compression_stats(doc, compressed)
+                    enc_meta = dict(meta)
+                    enc_meta["compression_ratio"] = round(stats["ratio"], 1)
+                    enc_batch_docs.append(compressed)
+                    enc_batch_ids.append(rec_id)
+                    enc_batch_metas.append(enc_meta)
+                except Exception:
+                    pass
+            if enc_batch_docs:
+                try:
+                    encoded_collection.upsert(
+                        ids=enc_batch_ids,
+                        documents=enc_batch_docs,
+                        metadatas=enc_batch_metas,
+                    )
+                except Exception:
+                    pass
+
         total_records += records_added
-        print(f"  Ã¢Å“â€œ [{i:4}/{len(files)}] {filepath.name[:50]:50} +{records_added}")
+        print(f"  ✔ [{i:4}/{len(files)}] {filepath.name[:50]:50} +{records_added}")
 
     print(f"\n{'=' * 55}")
     print("  Done.")

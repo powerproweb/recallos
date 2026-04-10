@@ -333,6 +333,172 @@ class RecallGraph:
             "relationship_types": predicates,
         }
 
+    # ── Path-finding ─────────────────────────────────────────────────────
+
+    def find_path(
+        self,
+        entity_a: str,
+        entity_b: str,
+        max_depth: int = 4,
+        as_of: str = None,
+    ):
+        """
+        Find the shortest relationship path between two entities using BFS.
+
+        Returns a list of steps:
+            [{"from": str, "predicate": str, "to": str}, ...]
+        or None if no path exists within max_depth hops.
+        """
+        a_id = self._entity_id(entity_a)
+        b_id = self._entity_id(entity_b)
+
+        if a_id == b_id:
+            return []  # same entity
+
+        conn = self._conn()
+
+        def neighbors(eid):
+            """Return all entity IDs directly reachable from eid (both directions)."""
+            q = "SELECT subject, predicate, object FROM triples WHERE (subject=? OR object=?)"
+            params = [eid, eid]
+            if as_of:
+                q += " AND (valid_from IS NULL OR valid_from <= ?) AND (valid_to IS NULL OR valid_to >= ?)"
+                params.extend([as_of, as_of])
+            else:
+                q += " AND valid_to IS NULL"
+            rows = conn.execute(q, params).fetchall()
+            result = []
+            for sub, pred, obj in rows:
+                if sub == eid:
+                    result.append((obj, pred, "outgoing"))
+                else:
+                    result.append((sub, pred, "incoming"))
+            return result
+
+        # BFS
+        # Each queue entry: (current_eid, path_so_far)
+        # path_so_far: list of (from_id, predicate, to_id)
+        from collections import deque
+
+        queue = deque([(a_id, [])])
+        visited = {a_id}
+
+        while queue:
+            current, path = queue.popleft()
+            if len(path) >= max_depth:
+                continue
+            for neighbor_id, pred, direction in neighbors(current):
+                if neighbor_id in visited:
+                    continue
+                step = (
+                    {"from": current, "predicate": pred, "to": neighbor_id}
+                    if direction == "outgoing"
+                    else {"from": neighbor_id, "predicate": pred, "to": current}
+                )
+                new_path = path + [step]
+                if neighbor_id == b_id:
+                    conn.close()
+                    # Resolve entity IDs back to names
+                    all_ids = {a_id, b_id} | {s["from"] for s in new_path} | {s["to"] for s in new_path}
+                    name_map = {}
+                    conn3 = sqlite3.connect(self.db_path, timeout=10)
+                    for eid in all_ids:
+                        r = conn3.execute("SELECT name FROM entities WHERE id=?", (eid,)).fetchone()
+                        name_map[eid] = r[0] if r else eid
+                    conn3.close()
+                    return [
+                        {
+                            "from": name_map.get(s["from"], s["from"]),
+                            "predicate": s["predicate"],
+                            "to": name_map.get(s["to"], s["to"]),
+                        }
+                        for s in new_path
+                    ]
+                visited.add(neighbor_id)
+                queue.append((neighbor_id, new_path))
+
+        conn.close()
+        return None  # no path found
+
+    # ── Export ───────────────────────────────────────────────────────────────
+
+    def export_dot(self, current_only: bool = True) -> str:
+        """
+        Export the graph as a Graphviz DOT string.
+
+        Args:
+            current_only: If True (default), only include non-expired triples.
+
+        Returns:
+            A DOT-format string renderable with `dot -Tpng graph.dot > graph.png`.
+        """
+        conn = self._conn()
+        q = """
+            SELECT s.name, t.predicate, o.name
+            FROM triples t
+            JOIN entities s ON t.subject = s.id
+            JOIN entities o ON t.object = o.id
+        """
+        if current_only:
+            q += " WHERE t.valid_to IS NULL"
+        rows = conn.execute(q).fetchall()
+        conn.close()
+
+        lines = ["digraph RecallGraph {"]
+        lines.append("  rankdir=LR;")
+        lines.append('  node [shape=box fontname="Helvetica" fontsize=10];')
+        lines.append("")
+        seen_nodes = set()
+        for sub, pred, obj in rows:
+            for name in (sub, obj):
+                if name not in seen_nodes:
+                    safe = name.replace('"', "'")
+                    lines.append(f'  "{safe}";')
+                    seen_nodes.add(name)
+        lines.append("")
+        for sub, pred, obj in rows:
+            s = sub.replace('"', "'")
+            p = pred.replace('"', "'")
+            o = obj.replace('"', "'")
+            lines.append(f'  "{s}" -> "{o}" [label="{p}"];')
+        lines.append("}")
+        return "\n".join(lines)
+
+    def export_json(self, current_only: bool = True) -> dict:
+        """
+        Export the graph as a JSON adjacency structure for D3/JS visualization.
+
+        Returns:
+            {"nodes": [{"id": str, "name": str, "type": str}],
+             "edges": [{"source": str, "target": str, "predicate": str,
+                        "valid_from": str, "valid_to": str}]}
+        """
+        conn = self._conn()
+
+        entity_rows = conn.execute("SELECT id, name, type FROM entities").fetchall()
+        nodes = [
+            {"id": row[0], "name": row[1], "type": row[2]}
+            for row in entity_rows
+        ]
+
+        q = "SELECT subject, predicate, object, valid_from, valid_to FROM triples"
+        if current_only:
+            q += " WHERE valid_to IS NULL"
+        triple_rows = conn.execute(q).fetchall()
+        edges = [
+            {
+                "source": row[0],
+                "target": row[2],
+                "predicate": row[1],
+                "valid_from": row[3],
+                "valid_to": row[4],
+            }
+            for row in triple_rows
+        ]
+
+        conn.close()
+        return {"nodes": nodes, "edges": edges}
+
     # ── Seed from known facts ─────────────────────────────────────────────
 
     def seed_from_entity_facts(self, entity_facts: dict):

@@ -86,18 +86,27 @@ def load_config(project_dir: str) -> dict:
 # =============================================================================
 
 
+def _strip_suffix(word: str) -> str:
+    """Light stemming: strip common English suffixes."""
+    for suffix in ("ing", "tion", "tions", "ed", "er", "ers", "s"):
+        if word.endswith(suffix) and len(word) - len(suffix) >= 3:
+            return word[: -len(suffix)]
+    return word
+
+
 def detect_node(filepath: Path, content: str, nodes: list, project_path: Path) -> str:
     """
     Route a file to the right node.
     Priority:
     1. Folder path matches a node name
     2. Filename matches a node name or keyword
-    3. Content keyword scoring
+    3. Content keyword scoring with position weighting
     4. Fallback: "general"
     """
+    import re as _re
+
     relative = str(filepath.relative_to(project_path)).lower()
     filename = filepath.stem.lower()
-    content_lower = content[:2000].lower()
 
     # Priority 1: folder path contains node name
     path_parts = relative.replace("\\", "/").split("/")
@@ -111,13 +120,25 @@ def detect_node(filepath: Path, content: str, nodes: list, project_path: Path) -
         if node["name"].lower() in filename or filename in node["name"].lower():
             return node["name"]
 
-    # Priority 3: keyword scoring from node keywords + name
+    # Priority 3: position-weighted keyword scoring
+    # Title/lead (first 500 chars) words get 3x weight
+    lead = content[:500].lower()
+    body = content[:2000].lower()
+    lead_words = set(_re.findall(r"\w+", lead))
+    lead_stems = {_strip_suffix(w) for w in lead_words}
+
     scores = defaultdict(int)
     for node in nodes:
         keywords = node.get("keywords", []) + [node["name"]]
         for kw in keywords:
-            count = content_lower.count(kw.lower())
-            scores[node["name"]] += count
+            kw_lower = kw.lower()
+            kw_stem = _strip_suffix(kw_lower)
+            body_count = body.count(kw_lower)
+            if body_count:
+                scores[node["name"]] += body_count
+            # 3x weight if keyword (or its stem) appears in the lead
+            if kw_lower in lead or kw_stem in lead_stems:
+                scores[node["name"]] += 3
 
     if scores:
         best = max(scores, key=scores.get)
@@ -238,6 +259,8 @@ def process_file(
     nodes: list,
     agent: str,
     dry_run: bool,
+    encode: bool = False,
+    encoded_collection=None,
 ) -> int:
     """Read, chunk, route, and file one file. Returns record count."""
 
@@ -259,8 +282,18 @@ def process_file(
     chunks = chunk_text(content, source_file)
 
     if dry_run:
-        print(f"    [DRY RUN] {filepath.name} ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ node:{node} ({len(chunks)} records)")
+        encode_label = " +encode" if encode else ""
+        print(f"    [DRY RUN] {filepath.name} → node:{node} ({len(chunks)} records{encode_label})")
         return len(chunks)
+
+    # Lazy-load RecallScript encoder only if needed
+    dialect = None
+    if encode:
+        try:
+            from .recallscript import Dialect
+            dialect = Dialect()
+        except Exception:
+            dialect = None
 
     records_added = 0
     for chunk in chunks:
@@ -275,6 +308,29 @@ def process_file(
         )
         if added:
             records_added += 1
+            # Also store RecallScript-encoded version if requested
+            if dialect and encoded_collection:
+                meta = {
+                    "domain": domain,
+                    "node": node,
+                    "source_file": source_file,
+                    "chunk_index": chunk["chunk_index"],
+                    "added_by": agent,
+                    "filed_at": datetime.now().isoformat(),
+                }
+                try:
+                    compressed = dialect.compress(chunk["content"], metadata=meta)
+                    stats = dialect.compression_stats(chunk["content"], compressed)
+                    enc_meta = dict(meta)
+                    enc_meta["compression_ratio"] = round(stats["ratio"], 1)
+                    record_id = f"record_{domain}_{node}_{hashlib.md5((source_file + str(chunk['chunk_index'])).encode()).hexdigest()[:16]}"
+                    encoded_collection.upsert(
+                        ids=[record_id],
+                        documents=[compressed],
+                        metadatas=[enc_meta],
+                    )
+                except Exception:
+                    pass  # Non-fatal — verbatim record already stored
 
     return records_added
 
@@ -319,6 +375,7 @@ def mine(
     agent: str = "recallos",
     limit: int = 0,
     dry_run: bool = False,
+    encode: bool = False,
 ):
     """Ingest a project directory into the Data Vault."""
 
@@ -345,8 +402,14 @@ def mine(
 
     if not dry_run:
         collection = get_collection(vault_path)
+        encoded_collection = None
+        if encode:
+            client = chromadb.PersistentClient(path=vault_path)
+            encoded_collection = client.get_or_create_collection("recallos_encoded")
+            print("  Encode: ON (storing RecallScript versions in recallos_encoded)")
     else:
         collection = None
+        encoded_collection = None
 
     total_records = 0
     files_skipped = 0
@@ -361,6 +424,8 @@ def mine(
             nodes=nodes,
             agent=agent,
             dry_run=dry_run,
+            encode=encode,
+            encoded_collection=encoded_collection,
         )
         if records == 0 and not dry_run:
             files_skipped += 1

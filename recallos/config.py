@@ -89,6 +89,25 @@ class RecallOSConfig:
             except (json.JSONDecodeError, OSError):
                 self._file_config = {}
 
+        # Detect legacy MemPalace installation
+        _legacy = Path(os.path.expanduser("~/.mempalace"))
+        self._legacy_dir = _legacy if _legacy.exists() else None
+
+    @property
+    def legacy_dir(self):
+        """Path to legacy ~/.mempalace directory, or None if it doesn't exist."""
+        return self._legacy_dir
+
+    @property
+    def legacy_warning(self):
+        """Return a warning string if legacy MemPalace data is detected, else None."""
+        if self._legacy_dir is not None:
+            return (
+                f"  \u26a0  Legacy MemPalace data found at {self._legacy_dir}\n"
+                "     Run: recallos migrate   to move your data to RecallOS"
+            )
+        return None
+
     @property
     def vault_path(self):
         """Path to the Data Vault directory."""

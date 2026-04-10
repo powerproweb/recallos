@@ -261,9 +261,47 @@ Additional `mcp_gateway.py` changes:
 
 ---
 
+---
+
+## [4.0.0-dev] — 2026-04-09 (session 5)
+
+### Phase 11 — README Rewrite ✅
+
+Full rewrite of `README.md` sourced from `readme_new_rebuild_app.md` (lines 1463–2128).
+
+Every section updated:
+- Hero: MemPalace → RecallOS, logo ref updated, tagline updated
+- Lead paragraph: The Palace/AAAK → The Data Vault/RecallScript
+- Quick Start: `pip install mempalace` → `pip install recallos`, all commands updated
+- How You Actually Use It: `claude mcp add mempalace` → `claude mcp add recallos`, `mempalace_search` → `recallos_query`, wake-up → bootstrap
+- The Problem cost table: MemPalace wake-up → RecallOS bootstrap
+- How It Works / The Palace → The Data Vault: full section rewrite with new ASCII diagram (DOMAIN/Node/channel/link/Index Summary/Source Record)
+- Why Structure Matters: metrics table updated (wings/halls → domains/channels/nodes)
+- Memory Stack: layer names updated (Identity Layer / Core Context Layer / Node Recall Layer / Deep Retrieval Layer)
+- AAAK Compression → RecallScript Compression section
+- Contradiction Detection: facts checked against Recall Graph (was knowledge graph)
+- Real-World Examples: all `mempalace mine/search --wing` → `recallos ingest/query --domain`
+- Knowledge Graph → Recall Graph: `KnowledgeGraph` → `RecallGraph`, `rg.*` API
+- Specialist Agents → Domain Agents: diary → Agent Log, AAAK → RecallScript
+- MCP Server: all 19 tool names updated, `mcp_server.py` → `mcp_gateway.py`
+- Auto-Save Hooks: hook filenames updated
+- Benchmarks: table entries updated (Personal palace → Personal Data Vault, MemPalace → RecallOS)
+- All Commands: full command reference updated
+- Configuration: `~/.mempalace` → `~/.recallos`, wing config → domain config, identity.txt → identity_profile.txt
+- File Reference: all module names updated to new names
+- Project Structure: tree updated
+- Footer badges: version 3.0.0 → 4.0.0, all URLs `mempalace` → `recallos`
+
+### Git commit
+
+- Initialized git repo (new project — no prior git history)
+- Committed 51 files, 16,646 insertions
+- Commit: `06f1e41` — `feat: RecallOS v4.0.0 - full rebuild from MemPalace`
+
+---
+
 ## Remaining Work
 
 | Phase | Status | Description |
 |---|---|---|
-| 11 | ❌ Not started | Docs (README rewrite from readme_new_rebuild_app.md) |
 | 12 | ❌ Not started | New Features (migration tool, doctor command, multi-format ingest, etc.) |

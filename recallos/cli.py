@@ -77,6 +77,7 @@ def cmd_mine(args):
             limit=args.limit,
             dry_run=args.dry_run,
             extract_mode=args.extract,
+            encode=getattr(args, "encode", False),
         )
     else:
         from .ingest_engine import mine
@@ -88,6 +89,7 @@ def cmd_mine(args):
             agent=args.agent,
             limit=args.limit,
             dry_run=args.dry_run,
+            encode=getattr(args, "encode", False),
         )
 
 
@@ -138,6 +140,21 @@ def cmd_split(args):
         split_main()
     finally:
         sys.argv = old_argv
+
+
+def cmd_doctor(args):
+    """Run vault health diagnostics."""
+    from .diagnostics import run_doctor
+
+    vault_path = os.path.expanduser(args.vault) if args.vault else None
+    run_doctor(vault_path=vault_path, verbose=args.verbose)
+
+
+def cmd_migrate(args):
+    """Migrate legacy ~/.mempalace/ data to ~/.recallos/."""
+    from .migration import migrate_from_mempalace
+
+    migrate_from_mempalace(dry_run=args.dry_run, force=args.force)
 
 
 def cmd_status(args):
@@ -303,6 +320,11 @@ def main():
         default="exchange",
         help="Extraction strategy for convos mode: 'exchange' (default) or 'general' (5 memory types)",
     )
+    p_ingest.add_argument(
+        "--encode",
+        action="store_true",
+        help="Also store RecallScript-encoded versions in recallos_encoded collection (~30x compression)",
+    )
 
     # query
     p_query = sub.add_parser("query", help="Semantic retrieval from the Data Vault")
@@ -353,11 +375,45 @@ def main():
     # status
     sub.add_parser("status", help="Show Data Vault overview")
 
+    # doctor
+    p_doctor = sub.add_parser(
+        "doctor",
+        help="Run vault health checks (integrity, orphans, legacy data)",
+    )
+    p_doctor.add_argument(
+        "--verbose",
+        action="store_true",
+        help="Show detail for all checks, not just warnings/failures",
+    )
+
+    # migrate
+    p_migrate = sub.add_parser(
+        "migrate",
+        help="Migrate legacy ~/.mempalace/ data to ~/.recallos/",
+    )
+    p_migrate.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Preview what would be migrated without making changes",
+    )
+    p_migrate.add_argument(
+        "--force",
+        action="store_true",
+        help="Overwrite existing RecallOS data if present",
+    )
+
     args = parser.parse_args()
 
     if not args.command:
         parser.print_help()
         return
+
+    # Warn once if a legacy ~/.mempalace directory is detected
+    _cfg = RecallOSConfig()
+    _warn = _cfg.legacy_warning
+    if _warn and args.command != "migrate":
+        print(_warn)
+        print()
 
     dispatch = {
         "init": cmd_init,
@@ -367,6 +423,8 @@ def main():
         "encode": cmd_encode,
         "bootstrap": cmd_bootstrap,
         "status": cmd_status,
+        "migrate": cmd_migrate,
+        "doctor": cmd_doctor,
     }
     dispatch[args.command](args)
 
