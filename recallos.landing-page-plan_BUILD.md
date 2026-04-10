@@ -300,10 +300,10 @@ Keep code snippets small, inside styled terminal-window mockups.
 - **Terminal mockup component:** CSS-only styled `<pre>` block with title bar dots
 
 ## Hosting & Deployment
-- Primary target: **Apache shared hosting** (`.htaccess` provided)
+- **Live URL:** https://quantumstoryforge.io/recallos/
+- Hosted on Apache shared hosting with `.htaccess` hardening
 - `.htaccess` includes: HTTPS redirect, security headers, gzip/brotli, browser caching, hotlink protection, bot blocking, error pages, clean URLs
-- Alternative: GitHub Pages (remove `.htaccess`, use `_headers` file for Netlify or `vercel.json`)
-- Domain: TBD (e.g. `recallos.dev` or `recallos.io`)
+- All 6 core files verified live (HTTP 200, sizes match local build)
 
 ---
 
@@ -318,7 +318,7 @@ These belong in expandable "learn more" areas lower on each page.
 
 ---
 
-## Project Status — Completed 2026-04-10
+## Project Status — Deployed 2026-04-10
 
 ### Delivered Files (13 files under `site/`)
 - `index.html` (23 KB) — Features page with hero, proof metrics band, 7 feature sections, How It Works, CTA
@@ -346,9 +346,19 @@ These belong in expandable "learn more" areas lower on each page.
 - "How It Works" 5-step section with terminal mockup: done
 - All navigation verified with relative paths (works via file:// and on server): done
 
-### Remaining Before Launch
+### Deployment Verified
+- **Live URL:** https://quantumstoryforge.io/recallos/
+- `index.html` — 200 OK, 22,746 bytes ✔
+- `benefits.html` — 200 OK, 20,203 bytes ✔
+- `css/styles.css` — 200 OK, 25,281 bytes ✔
+- `js/main.js` — 200 OK, 5,203 bytes ✔
+- `robots.txt` — 200 OK, 70 bytes ✔
+- `sitemap.xml` — 200 OK, 441 bytes ✔
+- PR #1 merged into `master` — all CI checks passed (Lint, Python 3.10/3.11/3.12)
+
+### Remaining Polish Items
 - **Assets to create:** `assets/og-card.png` (1200x630), `assets/favicon.ico`, `assets/apple-touch-icon.png` — referenced in HTML but not yet created
 - **Replace illustration placeholders:** 8 sections have `[ illustration ]` placeholder divs — replace with SVGs or graphics
 - **Discord link:** footer link is `href="#"` — update when Discord URL is available
-- **Domain:** canonical URLs and sitemap reference `recallos.dev` — update once domain is chosen
-- **`.htaccess` hotlink rules:** reference `recallos.(dev|io|com)` — update to match final domain
+- **Canonical URLs:** `sitemap.xml` and `<link rel="canonical">` reference `recallos.dev` — update to `quantumstoryforge.io/recallos` or final domain
+- **`.htaccess` hotlink rules:** reference `recallos.(dev|io|com)` — add `quantumstoryforge.io` to the allowlist
