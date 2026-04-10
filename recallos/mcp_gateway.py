@@ -409,12 +409,14 @@ def tool_log_read(agent_name: str, last_n: int = 10):
                     include=["documents", "metadatas"],
                 )
                 for doc, meta in zip(results.get("documents", []), results.get("metadatas", [])):
-                    entries.append({
-                        "date": meta.get("date", ""),
-                        "timestamp": meta.get("filed_at", ""),
-                        "topic": meta.get("topic", ""),
-                        "content": doc,
-                    })
+                    entries.append(
+                        {
+                            "date": meta.get("date", ""),
+                            "timestamp": meta.get("filed_at", ""),
+                            "topic": meta.get("topic", ""),
+                            "content": doc,
+                        }
+                    )
                 entries.sort(key=lambda x: x["timestamp"], reverse=True)
                 entries = entries[:last_n]
             except Exception:

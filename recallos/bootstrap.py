@@ -329,7 +329,9 @@ def _generate_recallscript_bootstrap(
             code = entity_codes[p["name"]]
             rel = p.get("relationship", "")
             facts_lines.append(
-                f"- **{p['name']}** ({code}) Ã¢â‚¬â€ {rel}" if rel else f"- **{p['name']}** ({code})"
+                f"- **{p['name']}** ({code}) Ã¢â‚¬â€ {rel}"
+                if rel
+                else f"- **{p['name']}** ({code})"
             )
         facts_lines.append("")
 
@@ -339,7 +341,9 @@ def _generate_recallscript_bootstrap(
             code = entity_codes[p["name"]]
             rel = p.get("relationship", "")
             facts_lines.append(
-                f"- **{p['name']}** ({code}) Ã¢â‚¬â€ {rel}" if rel else f"- **{p['name']}** ({code})"
+                f"- **{p['name']}** ({code}) Ã¢â‚¬â€ {rel}"
+                if rel
+                else f"- **{p['name']}** ({code})"
             )
         facts_lines.append("")
 

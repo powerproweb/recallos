@@ -334,20 +334,18 @@ def main():
     p_query.add_argument("--results", type=int, default=5, help="Number of results")
 
     # encode
-    p_encode = sub.add_parser(
-        "encode", help="Encode records using RecallScript (~30x compression)"
-    )
+    p_encode = sub.add_parser("encode", help="Encode records using RecallScript (~30x compression)")
     p_encode.add_argument("--domain", default=None, help="Domain to encode (default: all domains)")
-    p_encode.add_argument(
-        "--dry-run", action="store_true", help="Preview encoding without storing"
-    )
-    p_encode.add_argument(
-        "--config", default=None, help="Entity config JSON (e.g. entities.json)"
-    )
+    p_encode.add_argument("--dry-run", action="store_true", help="Preview encoding without storing")
+    p_encode.add_argument("--config", default=None, help="Entity config JSON (e.g. entities.json)")
 
     # bootstrap
-    p_bootstrap = sub.add_parser("bootstrap", help="Show L0 + L1 bootstrap context (~600-900 tokens)")
-    p_bootstrap.add_argument("--domain", default=None, help="Bootstrap for a specific project/domain")
+    p_bootstrap = sub.add_parser(
+        "bootstrap", help="Show L0 + L1 bootstrap context (~600-900 tokens)"
+    )
+    p_bootstrap.add_argument(
+        "--domain", default=None, help="Bootstrap for a specific project/domain"
+    )
 
     # split
     p_split = sub.add_parser(

@@ -291,6 +291,7 @@ def process_file(
     if encode:
         try:
             from .recallscript import Dialect
+
             dialect = Dialect()
         except Exception:
             dialect = None

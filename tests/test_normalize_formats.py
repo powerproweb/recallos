@@ -33,7 +33,7 @@ def _discord_msg(msg_id, username, content, msg_type="Default"):
 def test_discord_array_schema_returns_transcript():
     data = [
         _discord_msg("1", "alice", "Hey, is the deploy done?"),
-        _discord_msg("2", "bob",   "Just finished, looks good."),
+        _discord_msg("2", "bob", "Just finished, looks good."),
     ]
     result = _try_discord_json(data)
     assert result is not None
@@ -46,7 +46,7 @@ def test_discord_wrapped_schema():
     data = {
         "messages": [
             _discord_msg("1", "alice", "Hello"),
-            _discord_msg("2", "bob",   "World"),
+            _discord_msg("2", "bob", "World"),
         ]
     }
     result = _try_discord_json(data)
@@ -60,7 +60,7 @@ def test_discord_skips_non_default_message_types():
     data = [
         _discord_msg("1", "alice", "Hey"),
         _discord_msg("2", "system", "User joined the server", msg_type="UserJoin"),
-        _discord_msg("3", "bob",   "Hi"),
+        _discord_msg("3", "bob", "Hi"),
     ]
     result = _try_discord_json(data)
     assert result is not None
@@ -71,7 +71,7 @@ def test_discord_skips_empty_content():
     """Messages with empty content are silently dropped."""
     data = [
         _discord_msg("1", "alice", "Hi there"),
-        _discord_msg("2", "bob",   ""),          # empty → skipped
+        _discord_msg("2", "bob", ""),  # empty → skipped
         _discord_msg("3", "alice", "How are you?"),
     ]
     result = _try_discord_json(data)
@@ -83,7 +83,7 @@ def test_discord_two_speakers_alternate_roles():
     """First speaker → user, second speaker → assistant, roles alternate."""
     data = [
         _discord_msg("1", "alice", "Question"),
-        _discord_msg("2", "bob",   "Answer"),
+        _discord_msg("2", "bob", "Answer"),
     ]
     result = _try_discord_json(data)
     assert result is not None
@@ -122,7 +122,7 @@ def test_discord_via_normalize_json_file(tmp_path):
     """normalize() routes Discord JSON files correctly end-to-end."""
     data = [
         _discord_msg("1", "alice", "Deploy question"),
-        _discord_msg("2", "bob",   "Deploy answer"),
+        _discord_msg("2", "bob", "Deploy answer"),
     ]
     f = tmp_path / "discord_export.json"
     f.write_text(json.dumps(data), encoding="utf-8")

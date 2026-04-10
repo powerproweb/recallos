@@ -58,9 +58,7 @@ class Layer0:
             with open(self.path, "r") as f:
                 self._text = f.read().strip()
         else:
-            self._text = (
-                "## L0 Ã¢â‚¬â€ IDENTITY\nNo identity configured. Create ~/.recallos/identity_profile.txt"
-            )
+            self._text = "## L0 Ã¢â‚¬â€ IDENTITY\nNo identity configured. Create ~/.recallos/identity_profile.txt"
 
         return self._text
 

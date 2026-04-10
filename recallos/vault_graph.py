@@ -44,7 +44,9 @@ def build_graph(col=None, config=None):
         return {}, []
 
     total = col.count()
-    node_data = defaultdict(lambda: {"domains": set(), "channels": set(), "count": 0, "dates": set()})
+    node_data = defaultdict(
+        lambda: {"domains": set(), "channels": set(), "count": 0, "dates": set()}
+    )
 
     offset = 0
     while offset < total:

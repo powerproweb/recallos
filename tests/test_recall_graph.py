@@ -167,12 +167,14 @@ def test_query_entity_both_directions(rg):
 
     alice_results = rg.query_entity("Alice", direction="both")
     directions = {r["direction"] for r in alice_results}
-    assert "outgoing" in directions   # Alice → partner_of → Bob
-    assert "incoming" in directions   # Max → child_of → Alice
+    assert "outgoing" in directions  # Alice → partner_of → Bob
+    assert "incoming" in directions  # Max → child_of → Alice
 
 
 def test_query_entity_as_of_filters_by_date(rg):
-    rg.add_triple("Max", "attends", "Primary School", valid_from="2021-09-01", valid_to="2026-06-30")
+    rg.add_triple(
+        "Max", "attends", "Primary School", valid_from="2021-09-01", valid_to="2026-06-30"
+    )
     rg.add_triple("Max", "attends", "Secondary School", valid_from="2026-09-01")
 
     # In 2023, only Primary School is valid
@@ -233,7 +235,7 @@ def test_query_relationship_as_of_filter(rg):
 
 def test_timeline_all_facts_in_order(rg):
     rg.add_triple("Max", "does", "swimming", valid_from="2024-01-01")
-    rg.add_triple("Max", "loves", "chess",   valid_from="2025-06-01")
+    rg.add_triple("Max", "loves", "chess", valid_from="2025-06-01")
 
     tl = rg.timeline()
     assert len(tl) >= 2
@@ -243,7 +245,7 @@ def test_timeline_all_facts_in_order(rg):
 
 
 def test_timeline_entity_filter(rg):
-    rg.add_triple("Max",   "loves", "chess",   valid_from="2025-01-01")
+    rg.add_triple("Max", "loves", "chess", valid_from="2025-01-01")
     rg.add_triple("Alice", "loves", "painting", valid_from="2025-03-01")
 
     tl = rg.timeline("Max")
@@ -275,9 +277,9 @@ def test_stats_counts_correctly(rg):
     rg.invalidate("Max", "loves", "Chess", ended="2026-01-01")
 
     s = rg.stats()
-    assert s["entities"] == 3   # Max, Alice, Chess
+    assert s["entities"] == 3  # Max, Alice, Chess
     assert s["triples"] == 2
-    assert s["current_facts"] == 1    # child_of (loves was invalidated)
+    assert s["current_facts"] == 1  # child_of (loves was invalidated)
     assert s["expired_facts"] == 1
     assert "loves" in s["relationship_types"]
     assert "child_of" in s["relationship_types"]

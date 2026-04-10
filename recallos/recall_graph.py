@@ -399,7 +399,9 @@ class RecallGraph:
                 if neighbor_id == b_id:
                     conn.close()
                     # Resolve entity IDs back to names
-                    all_ids = {a_id, b_id} | {s["from"] for s in new_path} | {s["to"] for s in new_path}
+                    all_ids = (
+                        {a_id, b_id} | {s["from"] for s in new_path} | {s["to"] for s in new_path}
+                    )
                     name_map = {}
                     conn3 = sqlite3.connect(self.db_path, timeout=10)
                     for eid in all_ids:
@@ -476,10 +478,7 @@ class RecallGraph:
         conn = self._conn()
 
         entity_rows = conn.execute("SELECT id, name, type FROM entities").fetchall()
-        nodes = [
-            {"id": row[0], "name": row[1], "type": row[2]}
-            for row in entity_rows
-        ]
+        nodes = [{"id": row[0], "name": row[1], "type": row[2]} for row in entity_rows]
 
         q = "SELECT subject, predicate, object, valid_from, valid_to FROM triples"
         if current_only:

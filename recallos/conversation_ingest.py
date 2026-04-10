@@ -371,10 +371,12 @@ def mine_convos(
     dialect = None
     if encode and not dry_run:
         import chromadb as _chromadb
+
         _enc_client = _chromadb.PersistentClient(path=vault_path)
         encoded_collection = _enc_client.get_or_create_collection("recallos_encoded")
         try:
             from .recallscript import Dialect
+
             dialect = Dialect()
         except Exception:
             dialect = None
@@ -427,7 +429,9 @@ def mine_convos(
 
                 type_counts = Counter(c.get("memory_type", "general") for c in chunks)
                 types_str = ", ".join(f"{t}:{n}" for t, n in type_counts.most_common())
-                print(f"    [DRY RUN] {filepath.name} Ã¢â€ â€™ {len(chunks)} memories ({types_str})")
+                print(
+                    f"    [DRY RUN] {filepath.name} Ã¢â€ â€™ {len(chunks)} memories ({types_str})"
+                )
             else:
                 print(f"    [DRY RUN] {filepath.name} Ã¢â€ â€™ node:{node} ({len(chunks)} records)")
             total_records += len(chunks)
@@ -453,16 +457,18 @@ def mine_convos(
             if record_id not in mined_files:  # skip already-stored chunks
                 batch_docs.append(chunk["content"])
                 batch_ids.append(record_id)
-                batch_metas.append({
-                    "domain": domain,
-                    "node": chunk_node,
-                    "source_file": source_file,
-                    "chunk_index": chunk["chunk_index"],
-                    "added_by": agent,
-                    "filed_at": filed_at,
-                    "ingest_mode": "convos",
-                    "extract_mode": extract_mode,
-                })
+                batch_metas.append(
+                    {
+                        "domain": domain,
+                        "node": chunk_node,
+                        "source_file": source_file,
+                        "chunk_index": chunk["chunk_index"],
+                        "added_by": agent,
+                        "filed_at": filed_at,
+                        "ingest_mode": "convos",
+                        "extract_mode": extract_mode,
+                    }
+                )
 
         records_added = 0
         if batch_docs:
@@ -471,11 +477,11 @@ def mine_convos(
             for b in range(0, len(batch_docs), BATCH_SIZE):
                 try:
                     collection.add(
-                        documents=batch_docs[b:b+BATCH_SIZE],
-                        ids=batch_ids[b:b+BATCH_SIZE],
-                        metadatas=batch_metas[b:b+BATCH_SIZE],
+                        documents=batch_docs[b : b + BATCH_SIZE],
+                        ids=batch_ids[b : b + BATCH_SIZE],
+                        metadatas=batch_metas[b : b + BATCH_SIZE],
                     )
-                    records_added += len(batch_docs[b:b+BATCH_SIZE])
+                    records_added += len(batch_docs[b : b + BATCH_SIZE])
                 except Exception as e:
                     if "already exists" not in str(e).lower():
                         raise
@@ -522,7 +528,9 @@ def mine_convos(
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Usage: python conversation_ingest.py <convo_dir> [--palace PATH] [--limit N] [--dry-run]")
+        print(
+            "Usage: python conversation_ingest.py <convo_dir> [--palace PATH] [--limit N] [--dry-run]"
+        )
         sys.exit(1)
     from .config import RecallOSConfig
 

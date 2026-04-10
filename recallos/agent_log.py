@@ -53,6 +53,7 @@ class AgentLog:
 
     def _entry_id(self, timestamp: str, content: str) -> str:
         import hashlib
+
         return f"log_{self._agent_slug}_{timestamp[:10].replace('-', '')}_{hashlib.md5((timestamp + content[:30]).encode()).hexdigest()[:8]}"
 
     # ------------------------------------------------------------------
@@ -83,7 +84,11 @@ class AgentLog:
         if self._vault_path:
             self._write_to_chroma(entry_id, content, entry)
 
-        return {"entry_id": entry_id, "timestamp": entry["timestamp"], "file": str(self._today_file())}
+        return {
+            "entry_id": entry_id,
+            "timestamp": entry["timestamp"],
+            "file": str(self._today_file()),
+        }
 
     def _write_to_chroma(self, entry_id: str, content: str, meta: dict):
         """Best-effort ChromaDB write — silently skips if vault not available."""

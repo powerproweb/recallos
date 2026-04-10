@@ -49,8 +49,12 @@ def test_write_returns_metadata(log):
 def test_write_appends_valid_json_lines(log, tmp_path):
     log.write("first")
     log.write("second")
-    lines = (tmp_path / "tester" / f"{datetime.now().strftime('%Y-%m-%d')}.jsonl") \
-        .read_text(encoding="utf-8").strip().splitlines()
+    lines = (
+        (tmp_path / "tester" / f"{datetime.now().strftime('%Y-%m-%d')}.jsonl")
+        .read_text(encoding="utf-8")
+        .strip()
+        .splitlines()
+    )
     assert len(lines) == 2
     for line in lines:
         entry = json.loads(line)
@@ -125,15 +129,31 @@ def test_read_across_multiple_files(tmp_path):
         today = datetime.now().strftime("%Y-%m-%d")
 
         (log_dir / f"{yesterday}.jsonl").write_text(
-            json.dumps({"content": "old entry", "timestamp": f"{yesterday}T10:00:00",
-                        "topic": "g", "agent": "tester", "date": yesterday,
-                        "id": "old_id"}) + "\n",
+            json.dumps(
+                {
+                    "content": "old entry",
+                    "timestamp": f"{yesterday}T10:00:00",
+                    "topic": "g",
+                    "agent": "tester",
+                    "date": yesterday,
+                    "id": "old_id",
+                }
+            )
+            + "\n",
             encoding="utf-8",
         )
         (log_dir / f"{today}.jsonl").write_text(
-            json.dumps({"content": "new entry", "timestamp": f"{today}T10:00:00",
-                        "topic": "g", "agent": "tester", "date": today,
-                        "id": "new_id"}) + "\n",
+            json.dumps(
+                {
+                    "content": "new entry",
+                    "timestamp": f"{today}T10:00:00",
+                    "topic": "g",
+                    "agent": "tester",
+                    "date": today,
+                    "id": "new_id",
+                }
+            )
+            + "\n",
             encoding="utf-8",
         )
 

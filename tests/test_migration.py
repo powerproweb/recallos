@@ -54,15 +54,13 @@ def test_dry_run_creates_no_files(tmp_path):
 
     # Populate legacy dir with something for every step
     (legacy / "identity_profile.txt").write_text("I am Atlas.", encoding="utf-8")
-    (legacy / "config.json").write_text(
-        json.dumps({"palace_path": "/old/vault"}), encoding="utf-8"
-    )
+    (legacy / "config.json").write_text(json.dumps({"palace_path": "/old/vault"}), encoding="utf-8")
 
     with patch.multiple(
         migration_module,
         LEGACY_DIR=legacy,
         NEW_DIR=new,
-        LEGACY_VAULT=legacy / "vault",       # no vault dir → Chroma step skips
+        LEGACY_VAULT=legacy / "vault",  # no vault dir → Chroma step skips
         NEW_VAULT=new / "vault",
         LEGACY_GRAPH=legacy / "knowledge_graph.sqlite3",  # doesn't exist → graph step skips
         NEW_GRAPH=new / "recall_graph.sqlite3",
@@ -94,7 +92,7 @@ def test_full_migration_creates_new_files(tmp_path):
         migration_module,
         LEGACY_DIR=legacy,
         NEW_DIR=new,
-        LEGACY_VAULT=legacy / "vault",       # no vault dir → Chroma skips
+        LEGACY_VAULT=legacy / "vault",  # no vault dir → Chroma skips
         NEW_VAULT=new / "vault",
         LEGACY_GRAPH=legacy / "knowledge_graph.sqlite3",  # absent → graph skips
         NEW_GRAPH=new / "recall_graph.sqlite3",
@@ -314,11 +312,13 @@ def test_config_remaps_legacy_keys(tmp_path):
     legacy_cfg = tmp_path / "legacy_config.json"
     new_cfg = tmp_path / "new_config.json"
     legacy_cfg.write_text(
-        json.dumps({
-            "palace_path": "/old/vault",
-            "topic_wings": ["emotions", "memory"],
-            "hall_keywords": {"emotions": ["sad"]},
-        }),
+        json.dumps(
+            {
+                "palace_path": "/old/vault",
+                "topic_wings": ["emotions", "memory"],
+                "hall_keywords": {"emotions": ["sad"]},
+            }
+        ),
         encoding="utf-8",
     )
 

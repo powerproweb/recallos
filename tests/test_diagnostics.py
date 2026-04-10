@@ -70,10 +70,12 @@ def _expanduser_for(real_path: str, target_suffix: str):
     When the argument ends with *target_suffix*, return *real_path*.
     Otherwise fall through to _REAL_EXPANDUSER (captured before any patch).
     """
+
     def _side_effect(p):
         if p.endswith(target_suffix):
             return real_path
         return _REAL_EXPANDUSER(p)
+
     return _side_effect
 
 
@@ -173,7 +175,7 @@ def test_incomplete_missing_node_returns_warn():
         "ids": ["r1", "r2"],
         "metadatas": [
             {"domain": "dom", "node": "backend"},
-            {"domain": "dom"},           # missing node
+            {"domain": "dom"},  # missing node
         ],
     }
     result = _check_incomplete_records(mock_col, verbose=False)
@@ -186,7 +188,7 @@ def test_incomplete_missing_domain_returns_warn():
     mock_col.get.return_value = {
         "ids": ["r1"],
         "metadatas": [
-            {"node": "backend"},         # missing domain
+            {"node": "backend"},  # missing domain
         ],
     }
     result = _check_incomplete_records(mock_col, verbose=False)

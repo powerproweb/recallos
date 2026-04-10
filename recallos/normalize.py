@@ -319,7 +319,7 @@ def _normalize_obsidian_note(content: str) -> str:
 
     # Convert [[wikilinks]] and [[wikilinks|aliases]]
     content = re.sub(r"\[\[([^|\]]+)\|([^\]]+)\]\]", r"\2", content)  # [[target|alias]] → alias
-    content = re.sub(r"\[\[([^\]]+)\]\]", r"\1", content)              # [[target]] → target
+    content = re.sub(r"\[\[([^\]]+)\]\]", r"\1", content)  # [[target]] → target
 
     return content.strip()
 

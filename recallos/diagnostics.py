@@ -52,7 +52,9 @@ def _print_result(r: dict, verbose: bool = False):
 def _check_vault_dir(vault_path: str) -> dict:
     p = Path(vault_path)
     if not p.exists():
-        return _result(WARN, "Vault directory", f"Not found: {vault_path}  (run: recallos init <dir>)")
+        return _result(
+            WARN, "Vault directory", f"Not found: {vault_path}  (run: recallos init <dir>)"
+        )
     if not p.is_dir():
         return _result(FAIL, "Vault directory", f"{vault_path} exists but is not a directory")
     return _result(PASS, "Vault directory", str(vault_path))
@@ -80,16 +82,12 @@ def _check_incomplete_records(col, verbose: bool) -> dict:
         results = col.get(include=["metadatas"])
         metas = results.get("metadatas", [])
         ids = results.get("ids", [])
-        missing = [
-            ids[i]
-            for i, m in enumerate(metas)
-            if not m.get("domain") or not m.get("node")
-        ]
+        missing = [ids[i] for i, m in enumerate(metas) if not m.get("domain") or not m.get("node")]
         if not missing:
             detail = f"{len(metas):,} records checked" if verbose else ""
             return _result(PASS, "Incomplete records", detail)
         sample = ", ".join(missing[:3])
-        extra = f" (+{len(missing)-3} more)" if len(missing) > 3 else ""
+        extra = f" (+{len(missing) - 3} more)" if len(missing) > 3 else ""
         return _result(
             WARN,
             "Incomplete records",
@@ -103,7 +101,9 @@ def _check_recall_graph() -> dict:
     """Run SQLite PRAGMA integrity_check on recall_graph.sqlite3."""
     graph_path = Path(os.path.expanduser("~/.recallos/recall_graph.sqlite3"))
     if not graph_path.exists():
-        return _result(INFO, "Recall graph SQLite", "Not found — graph is empty (no triples added yet)")
+        return _result(
+            INFO, "Recall graph SQLite", "Not found — graph is empty (no triples added yet)"
+        )
     try:
         conn = sqlite3.connect(str(graph_path), timeout=5)
         rows = conn.execute("PRAGMA integrity_check").fetchall()

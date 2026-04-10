@@ -63,10 +63,20 @@ def test_build_graph_empty_collection():
 
 def test_build_graph_single_domain_no_edges():
     """A node appearing in only one domain creates a node entry but no edge."""
-    client, col, tmpdir = _make_col([
-        {"id": "r1", "doc": "x", "meta": {"node": "auth", "domain": "proj_a", "channel": "channel_facts"}},
-        {"id": "r2", "doc": "y", "meta": {"node": "auth", "domain": "proj_a", "channel": "channel_facts"}},
-    ])
+    client, col, tmpdir = _make_col(
+        [
+            {
+                "id": "r1",
+                "doc": "x",
+                "meta": {"node": "auth", "domain": "proj_a", "channel": "channel_facts"},
+            },
+            {
+                "id": "r2",
+                "doc": "y",
+                "meta": {"node": "auth", "domain": "proj_a", "channel": "channel_facts"},
+            },
+        ]
+    )
     nodes, edges = build_graph(col=col)
     assert "auth" in nodes
     assert nodes["auth"]["count"] == 2
@@ -77,10 +87,20 @@ def test_build_graph_single_domain_no_edges():
 
 def test_build_graph_multi_domain_creates_edge():
     """The same node in two domains → one edge per channel."""
-    client, col, tmpdir = _make_col([
-        {"id": "r1", "doc": "x", "meta": {"node": "auth", "domain": "proj_a", "channel": "channel_facts"}},
-        {"id": "r2", "doc": "y", "meta": {"node": "auth", "domain": "proj_b", "channel": "channel_facts"}},
-    ])
+    client, col, tmpdir = _make_col(
+        [
+            {
+                "id": "r1",
+                "doc": "x",
+                "meta": {"node": "auth", "domain": "proj_a", "channel": "channel_facts"},
+            },
+            {
+                "id": "r2",
+                "doc": "y",
+                "meta": {"node": "auth", "domain": "proj_b", "channel": "channel_facts"},
+            },
+        ]
+    )
     nodes, edges = build_graph(col=col)
     assert "auth" in nodes
     assert set(nodes["auth"]["domains"]) == {"proj_a", "proj_b"}
@@ -93,9 +113,15 @@ def test_build_graph_multi_domain_creates_edge():
 
 def test_build_graph_general_node_excluded():
     """Records with node='general' must not appear in the graph."""
-    client, col, tmpdir = _make_col([
-        {"id": "r1", "doc": "x", "meta": {"node": "general", "domain": "proj_a", "channel": ""}},
-    ])
+    client, col, tmpdir = _make_col(
+        [
+            {
+                "id": "r1",
+                "doc": "x",
+                "meta": {"node": "general", "domain": "proj_a", "channel": ""},
+            },
+        ]
+    )
     nodes, edges = build_graph(col=col)
     assert "general" not in nodes
     _cleanup(client, tmpdir)
@@ -103,9 +129,11 @@ def test_build_graph_general_node_excluded():
 
 def test_build_graph_missing_domain_excluded():
     """Records with no domain set must not appear in the graph."""
-    client, col, tmpdir = _make_col([
-        {"id": "r1", "doc": "x", "meta": {"node": "auth", "domain": "", "channel": ""}},
-    ])
+    client, col, tmpdir = _make_col(
+        [
+            {"id": "r1", "doc": "x", "meta": {"node": "auth", "domain": "", "channel": ""}},
+        ]
+    )
     nodes, edges = build_graph(col=col)
     assert "auth" not in nodes
     _cleanup(client, tmpdir)
@@ -120,12 +148,30 @@ def test_build_graph_no_collection_returns_empty():
 
 def test_build_graph_multiple_channels_multiple_edges():
     """Same node in two domains, two channels → two edges."""
-    client, col, tmpdir = _make_col([
-        {"id": "r1", "doc": "x", "meta": {"node": "db", "domain": "proj_a", "channel": "channel_facts"}},
-        {"id": "r2", "doc": "y", "meta": {"node": "db", "domain": "proj_a", "channel": "channel_events"}},
-        {"id": "r3", "doc": "z", "meta": {"node": "db", "domain": "proj_b", "channel": "channel_facts"}},
-        {"id": "r4", "doc": "w", "meta": {"node": "db", "domain": "proj_b", "channel": "channel_events"}},
-    ])
+    client, col, tmpdir = _make_col(
+        [
+            {
+                "id": "r1",
+                "doc": "x",
+                "meta": {"node": "db", "domain": "proj_a", "channel": "channel_facts"},
+            },
+            {
+                "id": "r2",
+                "doc": "y",
+                "meta": {"node": "db", "domain": "proj_a", "channel": "channel_events"},
+            },
+            {
+                "id": "r3",
+                "doc": "z",
+                "meta": {"node": "db", "domain": "proj_b", "channel": "channel_facts"},
+            },
+            {
+                "id": "r4",
+                "doc": "w",
+                "meta": {"node": "db", "domain": "proj_b", "channel": "channel_events"},
+            },
+        ]
+    )
     nodes, edges = build_graph(col=col)
     # 2 channels × 1 domain pair = 2 edges
     assert len(edges) == 2
@@ -139,9 +185,15 @@ def test_build_graph_multiple_channels_multiple_edges():
 
 def test_traverse_node_not_found():
     """Traversing a non-existent node returns an error dict with suggestions."""
-    client, col, tmpdir = _make_col([
-        {"id": "r1", "doc": "x", "meta": {"node": "auth-setup", "domain": "proj_a", "channel": "channel_facts"}},
-    ])
+    client, col, tmpdir = _make_col(
+        [
+            {
+                "id": "r1",
+                "doc": "x",
+                "meta": {"node": "auth-setup", "domain": "proj_a", "channel": "channel_facts"},
+            },
+        ]
+    )
     result = traverse("nonexistent", col=col)
     assert isinstance(result, dict)
     assert "error" in result
@@ -151,9 +203,15 @@ def test_traverse_node_not_found():
 
 def test_traverse_node_not_found_suggests_partial_match():
     """Fuzzy suggestions include partial matches for the query."""
-    client, col, tmpdir = _make_col([
-        {"id": "r1", "doc": "x", "meta": {"node": "auth-setup", "domain": "proj_a", "channel": "channel_facts"}},
-    ])
+    client, col, tmpdir = _make_col(
+        [
+            {
+                "id": "r1",
+                "doc": "x",
+                "meta": {"node": "auth-setup", "domain": "proj_a", "channel": "channel_facts"},
+            },
+        ]
+    )
     result = traverse("auth", col=col)
     assert isinstance(result, dict)
     assert "auth-setup" in result["suggestions"]
@@ -162,9 +220,15 @@ def test_traverse_node_not_found_suggests_partial_match():
 
 def test_traverse_returns_start_node():
     """Traversal always includes the start node at hop=0."""
-    client, col, tmpdir = _make_col([
-        {"id": "r1", "doc": "x", "meta": {"node": "auth", "domain": "proj_a", "channel": "channel_facts"}},
-    ])
+    client, col, tmpdir = _make_col(
+        [
+            {
+                "id": "r1",
+                "doc": "x",
+                "meta": {"node": "auth", "domain": "proj_a", "channel": "channel_facts"},
+            },
+        ]
+    )
     result = traverse("auth", col=col)
     assert isinstance(result, list)
     assert result[0]["node"] == "auth"
@@ -174,10 +238,20 @@ def test_traverse_returns_start_node():
 
 def test_traverse_finds_connected_node():
     """Nodes sharing a domain appear in traversal results at hop=1."""
-    client, col, tmpdir = _make_col([
-        {"id": "r1", "doc": "x", "meta": {"node": "auth", "domain": "proj_a", "channel": "channel_facts"}},
-        {"id": "r2", "doc": "y", "meta": {"node": "billing", "domain": "proj_a", "channel": "channel_facts"}},
-    ])
+    client, col, tmpdir = _make_col(
+        [
+            {
+                "id": "r1",
+                "doc": "x",
+                "meta": {"node": "auth", "domain": "proj_a", "channel": "channel_facts"},
+            },
+            {
+                "id": "r2",
+                "doc": "y",
+                "meta": {"node": "billing", "domain": "proj_a", "channel": "channel_facts"},
+            },
+        ]
+    )
     result = traverse("auth", col=col)
     nodes_found = [r["node"] for r in result]
     assert "auth" in nodes_found
@@ -189,12 +263,30 @@ def test_traverse_finds_connected_node():
 
 def test_traverse_max_hops_1_limits_results():
     """max_hops=1 stops after direct connections; 2-hop nodes are excluded."""
-    client, col, tmpdir = _make_col([
-        {"id": "r1", "doc": "x", "meta": {"node": "auth",    "domain": "proj_a", "channel": "channel_facts"}},
-        {"id": "r2", "doc": "y", "meta": {"node": "billing", "domain": "proj_a", "channel": "channel_facts"}},
-        {"id": "r3", "doc": "z", "meta": {"node": "billing", "domain": "proj_b", "channel": "channel_facts"}},
-        {"id": "r4", "doc": "w", "meta": {"node": "deploy",  "domain": "proj_b", "channel": "channel_facts"}},
-    ])
+    client, col, tmpdir = _make_col(
+        [
+            {
+                "id": "r1",
+                "doc": "x",
+                "meta": {"node": "auth", "domain": "proj_a", "channel": "channel_facts"},
+            },
+            {
+                "id": "r2",
+                "doc": "y",
+                "meta": {"node": "billing", "domain": "proj_a", "channel": "channel_facts"},
+            },
+            {
+                "id": "r3",
+                "doc": "z",
+                "meta": {"node": "billing", "domain": "proj_b", "channel": "channel_facts"},
+            },
+            {
+                "id": "r4",
+                "doc": "w",
+                "meta": {"node": "deploy", "domain": "proj_b", "channel": "channel_facts"},
+            },
+        ]
+    )
     # auth → proj_a → billing → proj_b → deploy  (2 hops from auth)
     result_1 = traverse("auth", col=col, max_hops=1)
     result_2 = traverse("auth", col=col, max_hops=2)
@@ -204,7 +296,7 @@ def test_traverse_max_hops_1_limits_results():
 
     assert "billing" in hops_1
     assert "deploy" not in hops_1  # 2 hops away
-    assert "deploy" in hops_2      # reachable at max_hops=2
+    assert "deploy" in hops_2  # reachable at max_hops=2
     _cleanup(client, tmpdir)
 
 
@@ -215,11 +307,17 @@ def test_traverse_max_hops_1_limits_results():
 
 def test_find_links_returns_multi_domain_nodes():
     """find_links only returns nodes appearing in 2+ domains."""
-    client, col, tmpdir = _make_col([
-        {"id": "r1", "doc": "x", "meta": {"node": "auth",    "domain": "proj_a", "channel": ""}},
-        {"id": "r2", "doc": "y", "meta": {"node": "auth",    "domain": "proj_b", "channel": ""}},
-        {"id": "r3", "doc": "z", "meta": {"node": "billing", "domain": "proj_a", "channel": ""}},
-    ])
+    client, col, tmpdir = _make_col(
+        [
+            {"id": "r1", "doc": "x", "meta": {"node": "auth", "domain": "proj_a", "channel": ""}},
+            {"id": "r2", "doc": "y", "meta": {"node": "auth", "domain": "proj_b", "channel": ""}},
+            {
+                "id": "r3",
+                "doc": "z",
+                "meta": {"node": "billing", "domain": "proj_a", "channel": ""},
+            },
+        ]
+    )
     links = find_links(col=col)
     link_nodes = [lnk["node"] for lnk in links]
     assert "auth" in link_nodes
@@ -229,12 +327,14 @@ def test_find_links_returns_multi_domain_nodes():
 
 def test_find_links_domain_filter():
     """domain_a filter returns only links containing that domain."""
-    client, col, tmpdir = _make_col([
-        {"id": "r1", "doc": "x", "meta": {"node": "auth",   "domain": "proj_a", "channel": ""}},
-        {"id": "r2", "doc": "y", "meta": {"node": "auth",   "domain": "proj_b", "channel": ""}},
-        {"id": "r3", "doc": "z", "meta": {"node": "cache",  "domain": "proj_b", "channel": ""}},
-        {"id": "r4", "doc": "w", "meta": {"node": "cache",  "domain": "proj_c", "channel": ""}},
-    ])
+    client, col, tmpdir = _make_col(
+        [
+            {"id": "r1", "doc": "x", "meta": {"node": "auth", "domain": "proj_a", "channel": ""}},
+            {"id": "r2", "doc": "y", "meta": {"node": "auth", "domain": "proj_b", "channel": ""}},
+            {"id": "r3", "doc": "z", "meta": {"node": "cache", "domain": "proj_b", "channel": ""}},
+            {"id": "r4", "doc": "w", "meta": {"node": "cache", "domain": "proj_c", "channel": ""}},
+        ]
+    )
     links_a = find_links(domain_a="proj_a", col=col)
     link_nodes_a = [lnk["node"] for lnk in links_a]
     assert "auth" in link_nodes_a
@@ -244,23 +344,27 @@ def test_find_links_domain_filter():
 
 def test_find_links_both_domain_filter():
     """Both domain_a and domain_b filter returns only nodes in both."""
-    client, col, tmpdir = _make_col([
-        {"id": "r1", "doc": "x", "meta": {"node": "auth",  "domain": "proj_a", "channel": ""}},
-        {"id": "r2", "doc": "y", "meta": {"node": "auth",  "domain": "proj_b", "channel": ""}},
-        {"id": "r3", "doc": "z", "meta": {"node": "cache", "domain": "proj_a", "channel": ""}},
-        {"id": "r4", "doc": "w", "meta": {"node": "cache", "domain": "proj_c", "channel": ""}},
-    ])
+    client, col, tmpdir = _make_col(
+        [
+            {"id": "r1", "doc": "x", "meta": {"node": "auth", "domain": "proj_a", "channel": ""}},
+            {"id": "r2", "doc": "y", "meta": {"node": "auth", "domain": "proj_b", "channel": ""}},
+            {"id": "r3", "doc": "z", "meta": {"node": "cache", "domain": "proj_a", "channel": ""}},
+            {"id": "r4", "doc": "w", "meta": {"node": "cache", "domain": "proj_c", "channel": ""}},
+        ]
+    )
     links = find_links(domain_a="proj_a", domain_b="proj_b", col=col)
     link_nodes = [lnk["node"] for lnk in links]
-    assert "auth" in link_nodes   # in both proj_a and proj_b
+    assert "auth" in link_nodes  # in both proj_a and proj_b
     assert "cache" not in link_nodes  # proj_a + proj_c, not proj_b
     _cleanup(client, tmpdir)
 
 
 def test_find_links_empty_when_no_links():
-    client, col, tmpdir = _make_col([
-        {"id": "r1", "doc": "x", "meta": {"node": "auth", "domain": "proj_a", "channel": ""}},
-    ])
+    client, col, tmpdir = _make_col(
+        [
+            {"id": "r1", "doc": "x", "meta": {"node": "auth", "domain": "proj_a", "channel": ""}},
+        ]
+    )
     links = find_links(col=col)
     assert links == []
     _cleanup(client, tmpdir)
@@ -273,9 +377,15 @@ def test_find_links_empty_when_no_links():
 
 def test_graph_stats_structure():
     """graph_stats always returns the expected keys."""
-    client, col, tmpdir = _make_col([
-        {"id": "r1", "doc": "x", "meta": {"node": "auth", "domain": "proj_a", "channel": "channel_facts"}},
-    ])
+    client, col, tmpdir = _make_col(
+        [
+            {
+                "id": "r1",
+                "doc": "x",
+                "meta": {"node": "auth", "domain": "proj_a", "channel": "channel_facts"},
+            },
+        ]
+    )
     stats = graph_stats(col=col)
     assert "total_nodes" in stats
     assert "link_nodes" in stats
@@ -287,14 +397,20 @@ def test_graph_stats_structure():
 
 def test_graph_stats_counts():
     """graph_stats correctly counts nodes and link_nodes."""
-    client, col, tmpdir = _make_col([
-        {"id": "r1", "doc": "x", "meta": {"node": "auth",    "domain": "proj_a", "channel": ""}},
-        {"id": "r2", "doc": "y", "meta": {"node": "auth",    "domain": "proj_b", "channel": ""}},
-        {"id": "r3", "doc": "z", "meta": {"node": "billing", "domain": "proj_a", "channel": ""}},
-    ])
+    client, col, tmpdir = _make_col(
+        [
+            {"id": "r1", "doc": "x", "meta": {"node": "auth", "domain": "proj_a", "channel": ""}},
+            {"id": "r2", "doc": "y", "meta": {"node": "auth", "domain": "proj_b", "channel": ""}},
+            {
+                "id": "r3",
+                "doc": "z",
+                "meta": {"node": "billing", "domain": "proj_a", "channel": ""},
+            },
+        ]
+    )
     stats = graph_stats(col=col)
-    assert stats["total_nodes"] == 2       # auth, billing
-    assert stats["link_nodes"] == 1        # only auth spans 2 domains
+    assert stats["total_nodes"] == 2  # auth, billing
+    assert stats["link_nodes"] == 1  # only auth spans 2 domains
     assert stats["nodes_per_domain"]["proj_a"] == 2
     assert stats["nodes_per_domain"]["proj_b"] == 1
     _cleanup(client, tmpdir)

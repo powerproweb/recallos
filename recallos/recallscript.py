@@ -954,11 +954,15 @@ if __name__ == "__main__":
         print("RecallScript -- Compressed Symbolic Memory for Any LLM")
         print()
         print("Usage:")
-        print("  python recallscript.py <text>                         # Compress text from argument")
+        print(
+            "  python recallscript.py <text>                         # Compress text from argument"
+        )
         print("  python recallscript.py --file <zettel.json>           # Compress zettel JSON file")
         print("  python recallscript.py --all <zettel_dir>             # Compress all zettel files")
         print("  python recallscript.py --stats <zettel.json>          # Show compression stats")
-        print("  python recallscript.py --layer1 <zettel_dir>          # Generate Layer 1 wake-up file")
+        print(
+            "  python recallscript.py --layer1 <zettel_dir>          # Generate Layer 1 wake-up file"
+        )
         print("  python recallscript.py --init                         # Create example config")
         print()
         print("Options:")
@@ -1044,7 +1048,9 @@ if __name__ == "__main__":
         compressed = dialect.compress(text)
         stats = dialect.compression_stats(text, compressed)
         print(f"Original: ~{stats['original_tokens']} tokens ({stats['original_chars']} chars)")
-        print(f"RecallScript:     ~{stats['compressed_tokens']} tokens ({stats['compressed_chars']} chars)")
+        print(
+            f"RecallScript:     ~{stats['compressed_tokens']} tokens ({stats['compressed_chars']} chars)"
+        )
         print(f"Ratio:    {stats['ratio']:.1f}x")
         print()
         print(compressed)
