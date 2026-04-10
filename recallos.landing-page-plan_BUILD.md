@@ -315,3 +315,40 @@ Keep code snippets small, inside styled terminal-window mockups.
 - Dense paragraphs
 
 These belong in expandable "learn more" areas lower on each page.
+
+---
+
+## Project Status — Completed 2026-04-10
+
+### Delivered Files (13 files under `site/`)
+- `index.html` (23 KB) — Features page with hero, proof metrics band, 7 feature sections, How It Works, CTA
+- `benefits.html` (20 KB) — Benefits page with problem cards, before/after, 6 benefit sections, cost comparison, user profiles, stories, getting started
+- `css/styles.css` (25 KB) — Full design system: 12 CSS custom properties, responsive breakpoints (desktop/tablet/mobile), cards, buttons, terminal mockup, scroll animations, accessibility
+- `js/main.js` (5 KB) — IntersectionObserver fade-ups, sticky nav with blur, active section highlighting, hamburger toggle, back-to-top, pip-copy clipboard
+- `.htaccess` (14 KB) — HTTPS redirect, security headers (HSTS, CSP, X-Frame), gzip/brotli, browser caching, clean URLs, hotlink protection, bot blocking, exploit prevention
+- `robots.txt` — allows all crawlers, points to sitemap
+- `sitemap.xml` — both pages with lastmod dates
+- `errors/400.html`, `401.html`, `403.html`, `404.html`, `500.html`, `503.html` — branded error pages matching site design
+
+### Implemented from Plan
+- All Page 1 sections (hero through CTA): done
+- All Page 2 sections (hero through final CTA): done
+- Color palette with exact hex values: done (CSS custom properties)
+- Font stack (Inter + JetBrains Mono via Google Fonts): done
+- Responsive design (3 breakpoints, hamburger nav): done
+- Accessibility (WCAG AA contrast, skip-link, focus-visible, prefers-reduced-motion, semantic HTML): done
+- SEO (OG tags, Twitter Card, JSON-LD, canonical, robots.txt, sitemap.xml): done
+- Scroll UX (sticky nav, fade-up animations, back-to-top, active nav highlighting): done
+- Proof metrics band (96.6%, 100%, 30x, $0.70/yr): done
+- Cost comparison strip with actual dollar figures: done
+- Social proof badges (shields.io): done
+- Footer with pip-copy clipboard: done
+- "How It Works" 5-step section with terminal mockup: done
+- All navigation verified with relative paths (works via file:// and on server): done
+
+### Remaining Before Launch
+- **Assets to create:** `assets/og-card.png` (1200x630), `assets/favicon.ico`, `assets/apple-touch-icon.png` — referenced in HTML but not yet created
+- **Replace illustration placeholders:** 8 sections have `[ illustration ]` placeholder divs — replace with SVGs or graphics
+- **Discord link:** footer link is `href="#"` — update when Discord URL is available
+- **Domain:** canonical URLs and sitemap reference `recallos.dev` — update once domain is chosen
+- **`.htaccess` hotlink rules:** reference `recallos.(dev|io|com)` — update to match final domain
