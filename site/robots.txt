@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://recallos.dev/sitemap.xml
+Sitemap: https://quantumstoryforge.io/recallos/sitemap.xml

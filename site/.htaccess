@@ -270,6 +270,7 @@ ErrorDocument 503 /errors/503.html
 # ----------------------------------------------------------------------------
 <IfModule mod_rewrite.c>
     RewriteCond %{HTTP_REFERER} !^$ [NC]
+    RewriteCond %{HTTP_REFERER} !^https?://(www\.)?quantumstoryforge\.io [NC]
     RewriteCond %{HTTP_REFERER} !^https?://(www\.)?recallos\.(dev|io|com) [NC]
     RewriteCond %{HTTP_REFERER} !^https?://(www\.)?google\. [NC]
     RewriteCond %{HTTP_REFERER} !^https?://(www\.)?github\.com [NC]
