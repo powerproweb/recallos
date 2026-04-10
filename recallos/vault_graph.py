@@ -65,12 +65,12 @@ def build_graph(col=None, config=None):
             break
         offset += len(batch["ids"])
 
-    # Build edges from rooms that span multiple wings
+    # Build edges from nodes that span multiple domains
     edges = []
     for node, data in node_data.items():
         domains = sorted(data["domains"])
         if len(domains) >= 2:
-        for i, da in enumerate(domains):
+            for i, da in enumerate(domains):
                 for db in domains[i + 1 :]:
                     for ch in data["channels"]:
                         edges.append(
