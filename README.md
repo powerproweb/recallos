@@ -56,19 +56,26 @@ pip install recallos
 # Set up your working world — who you work with, what your projects are
 recallos init ~/projects/myapp
 
+# Migrate from a previous MemPalace installation (existing users only)
+recallos migrate --dry-run   # preview what would move
+recallos migrate             # move everything to ~/.recallos/
+
 # Ingest your data
-recallos ingest ~/projects/myapp                           # projects — code, docs, notes
-recallos ingest ~/chats/ --mode convos                    # convos — Claude, ChatGPT, Slack exports
-recallos ingest ~/chats/ --mode convos --extract general  # general — classifies into decisions, milestones, problems
+recallos ingest ~/projects/myapp                            # projects — code, docs, notes
+recallos ingest ~/chats/ --mode convos                     # convos — Claude, ChatGPT, Slack, Discord exports
+recallos ingest ~/chats/ --mode convos --extract general   # general — classifies into decisions, milestones, problems
+recallos ingest ~/projects/myapp --encode                  # also store RecallScript-compressed versions
 
 # Query anything you've ever discussed
 recallos query "why did we switch to GraphQL"
 
-# Check system status
+# Check system status and vault health
 recallos status
+recallos doctor              # full vault health report
+recallos doctor --verbose    # detail on every check
 ```
 
-Three ingest modes: **projects** (code and docs), **convos** (conversation exports), and **general** (auto-classifies into decisions, preferences, milestones, problems, and emotional context). Everything stays on your machine.
+Three ingest modes: **projects** (code and docs), **convos** (conversation exports — Claude, ChatGPT, Slack, Discord, Obsidian), and **general** (auto-classifies into decisions, preferences, milestones, problems, and emotional context). Everything stays on your machine.
 
 ---
 
@@ -343,9 +350,17 @@ rg.query_entity("Kai")
 rg.query_entity("Maya", as_of="2026-01-20")
 # → [Maya → assigned_to → auth-migration (active)]
 
+# Path-finding between entities
+rg.find_path("Kai", "Clerk")
+# → [{from: "Kai", predicate: "recommended", to: "Clerk"}]  (1 hop)
+
 # Timeline
 rg.timeline("Orion")
 # → chronological story of the project
+
+# Export for visualization
+rg.export_dot()   # Graphviz DOT string — render with `dot -Tpng graph.dot`
+rg.export_json()  # D3-ready adjacency JSON — {"nodes": [...], "edges": [...]}
 ```
 
 Facts have validity windows. When something stops being true, invalidate it:
@@ -397,9 +412,13 @@ recallos_log_write("reviewer",
 # Agent reads back its history
 recallos_log_read("reviewer", last_n=10)
 # → last 10 findings, compressed in RecallScript
+
+# Search across all log history by keyword
+recallos_log_search("reviewer", keyword="auth")
+# → every log entry mentioning auth, newest first
 ```
 
-Each agent is a specialist lens on your data. The reviewer remembers every bug pattern it has seen. The architect remembers every design decision. The ops agent remembers every incident. They do not share a scratchpad — they each maintain their own memory.
+Agent logs are file-backed (`~/.recallos/agent_logs/<agent>/YYYY-MM-DD.jsonl`) and also stored in ChromaDB for semantic search. Files rotate automatically after 30 days. Each agent is a specialist lens on your data. The reviewer remembers every bug pattern it has seen. The architect remembers every design decision. The ops agent remembers every incident. They do not share a scratchpad — they each maintain their own memory.
 
 ---
 
@@ -439,6 +458,7 @@ claude mcp add recallos -- python -m recallos.mcp_gateway
 | `recallos_graph_invalidate` | Mark facts as ended |
 | `recallos_graph_timeline` | Chronological entity story |
 | `recallos_graph_stats` | Graph overview |
+| `recallos_graph_path` | Shortest path between two entities (BFS) |
 
 **Link Navigation**
 
@@ -452,8 +472,9 @@ claude mcp add recallos -- python -m recallos.mcp_gateway
 
 | Tool | What |
 |------|------|
-| `recallos_log_write` | Write RecallScript log entry |
-| `recallos_log_read` | Read recent log entries |
+| `recallos_log_write` | Write RecallScript log entry (file + ChromaDB) |
+| `recallos_log_read` | Read recent log entries (file-backed, newest first) |
+| `recallos_log_search` | Keyword search across full log history |
 
 The AI learns RecallScript and the memory protocol automatically from the `recallos_status` response. No manual configuration needed.
 
@@ -509,34 +530,44 @@ The 96.6% raw score is the highest published LongMemEval result requiring no API
 
 ```bash
 # Setup
-recallos init <dir>                                # guided onboarding + RecallScript bootstrap
+recallos init <dir>                                  # guided onboarding + RecallScript bootstrap
+
+# Migration (existing MemPalace users)
+recallos migrate --dry-run                           # preview what would be moved
+recallos migrate                                     # move ~/.mempalace/ → ~/.recallos/
+recallos migrate --force                             # overwrite existing RecallOS data
 
 # Ingest
-recallos ingest <dir>                              # ingest project files
-recallos ingest <dir> --mode convos                # ingest conversation exports
-recallos ingest <dir> --mode convos --domain myapp # tag with a Domain name
+recallos ingest <dir>                                # ingest project files
+recallos ingest <dir> --mode convos                  # ingest conversation exports (Claude, ChatGPT, Slack, Discord, Obsidian)
+recallos ingest <dir> --mode convos --domain myapp   # tag with a Domain name
+recallos ingest <dir> --encode                       # also store RecallScript-compressed versions
+recallos ingest <dir> --dry-run                      # preview without filing
 
 # Splitting
-recallos split <dir>                               # split concatenated transcripts
-recallos split <dir> --dry-run                     # preview
+recallos split <dir>                                 # split concatenated transcripts
+recallos split <dir> --dry-run                       # preview
 
 # Query
-recallos query "query"                             # query everything
-recallos query "query" --domain myapp              # within a Domain
-recallos query "query" --node auth-migration       # within a Node
+recallos query "query"                               # query everything
+recallos query "query" --domain myapp                # within a Domain
+recallos query "query" --node auth-migration         # within a Node
 
 # Memory stack
-recallos bootstrap                                 # load L0 + L1 context
-recallos bootstrap --domain driftwood              # project-specific
+recallos bootstrap                                   # load L0 + L1 context
+recallos bootstrap --domain driftwood                # project-specific
 
 # Compression
-recallos encode --domain myapp                     # RecallScript encode
+recallos encode --domain myapp                       # RecallScript encode existing records
+recallos encode --dry-run                            # preview compression ratios
 
-# Status
-recallos status                                    # Data Vault overview
+# Status & Diagnostics
+recallos status                                      # Data Vault record overview
+recallos doctor                                      # full vault health report
+recallos doctor --verbose                            # detail on every check
 ```
 
-All commands accept `--vault <path>` to override the default location.
+All commands accept `--vault <path>` to override the default vault location.
 
 ---
 
@@ -578,7 +609,7 @@ Plain text. Becomes Layer 0 — loaded every session.
 |------|------|
 | `cli.py` | CLI entry point |
 | `config.py` | Configuration loading and defaults |
-| `normalize.py` | Converts 5 chat formats to standard transcript |
+| `normalize.py` | Converts 7 chat formats to standard transcript (Claude.ai, ChatGPT, Claude Code JSONL, Slack, Discord, Obsidian, plain text) |
 | `mcp_gateway.py` | MCP gateway — tools, RecallScript auto-teach, memory protocol |
 | `ingest_engine.py` | Project file ingest |
 | `conversation_ingest.py` | Conversation ingest — chunks by exchange pair |
@@ -591,6 +622,9 @@ Plain text. Becomes Layer 0 — loaded every session.
 | `entity_registry.py` | Entity code registry |
 | `entity_detector.py` | Auto-detect people and projects from content |
 | `transcript_splitter.py` | Split concatenated transcripts into per-session files |
+| `migration.py` | Migrate data from `~/.mempalace/` to `~/.recallos/` |
+| `diagnostics.py` | Vault health checks — `recallos doctor` command |
+| `agent_log.py` | File-backed agent log (`~/.recallos/agent_logs/`) |
 | `hooks/recallos_save_hook.sh` | Auto-save every N messages |
 | `hooks/recallos_precompact_hook.sh` | Emergency save before compaction |
 
@@ -611,6 +645,9 @@ recallos/
 │   ├── conversation_ingest.py    ← conversation ingest
 │   ├── retrieval_engine.py       ← semantic retrieval
 │   ├── bootstrap.py              ← guided setup
+│   ├── migration.py              ← migrate ~/.mempalace/ data
+│   ├── diagnostics.py            ← vault health checks
+│   ├── agent_log.py              ← file-backed agent logs
 │   └── ...                       ← see recallos/README.md
 ├── benchmarks/                   ← reproducible benchmark runners
 │   ├── README.md                 ← reproduction guide

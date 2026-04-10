@@ -300,8 +300,91 @@ Every section updated:
 
 ---
 
+---
+
+## [4.0.0] — 2026-04-10 (session 6)
+
+### Phase 12 — New Features ✅
+
+**F1 — `recallos migrate`** (`migration.py`)
+- New `recallos migrate [--dry-run] [--force]` command
+- Copies ChromaDB collections from `~/.mempalace/vault/` in 500-record batches, renames `mempalace_drawers` → `recallos_records` and `mempalace_encoded` → `recallos_encoded`
+- Copies `knowledge_graph.sqlite3` → `recall_graph.sqlite3`
+- Copies `identity_profile.txt` (skip if already present; `--force` to overwrite)
+- Maps legacy config keys: `palace_path` → `vault_path`, `topic_wings` → `topic_domains`, `hall_keywords` → `channel_keywords`
+
+**F2 — Backward-compatible config** (`config.py`)
+- `RecallOSConfig` now detects `~/.mempalace/` on init
+- New `legacy_warning` / `legacy_dir` properties
+- CLI prints a one-time warning before any non-`migrate` command when legacy dir is present
+
+**F3 — RecallScript during ingest** (`ingest_engine.py`, `conversation_ingest.py`, `cli.py`)
+- New `--encode` flag for `recallos ingest`
+- When set, stores RecallScript-compressed versions in `recallos_encoded` collection during the same ingest pass
+- Lazy-imports `Dialect` — no performance cost when `--encode` is not used
+
+**F4 — Improved domain auto-detection** (`conversation_ingest.py`, `ingest_engine.py`)
+- `detect_convo_node()`: added `TOPIC_BIGRAMS` dict (e.g. `pull request`, `stack trace`, `we decided`); text normalized before scoring; lead-500-char matches receive 2x weight; bigram matches count as 2 unigrams
+- `detect_node()`: added `_strip_suffix()` light stemmer (strips `-ing`, `-ed`, `-s`); lead-500-char keyword matches receive 3x weight
+
+**F5 — Richer Recall Graph** (`recall_graph.py`, `mcp_gateway.py`)
+- `RecallGraph.find_path(entity_a, entity_b, max_depth=4)` — BFS shortest-path between entities
+- `RecallGraph.export_dot(current_only=True)` — Graphviz DOT string (no graphviz library required)
+- `RecallGraph.export_json(current_only=True)` — D3-ready `{nodes, edges}` adjacency JSON
+- New `recallos_graph_path` MCP tool
+- Fixed pre-existing `source_closet` typo in `tool_graph_add` → `source_index`
+
+**F6 — Agent Log file persistence** (`agent_log.py`, `mcp_gateway.py`)
+- New `AgentLog` class: `write()`, `read()`, `search()`, `rotate()`, `stats()`
+- Logs stored at `~/.recallos/agent_logs/<agent>/YYYY-MM-DD.jsonl` (JSONL, one entry per line)
+- Also writes to ChromaDB for semantic search (best-effort, non-fatal on failure)
+- `tool_log_write` / `tool_log_read` updated to use `AgentLog`; ChromaDB fallback kept for legacy entries
+- New `recallos_log_search` MCP tool (keyword grep across all log files)
+
+**F7 — Multi-format ingest** (`normalize.py`)
+- `_try_discord_json()`: handles DiscordChatExporter array and `{"messages": [...]}` wrapped formats; alternates speaker roles
+- `_normalize_obsidian_note()`: strips YAML frontmatter (`---` delimiters) and converts `[[wikilinks]]` / `[[wikilinks|aliases]]`
+- Both integrated into `normalize()` dispatch chain
+- Supported formats: Claude.ai JSON, ChatGPT JSON, Claude Code JSONL, Slack JSON, Discord JSON, Obsidian markdown, plain text (7 total)
+
+**F8 — `recallos doctor`** (`diagnostics.py`)
+- New `recallos doctor [--verbose]` command
+- 7 checks: vault directory, ChromaDB collection, incomplete records (missing `domain`/`node`), `recall_graph.sqlite3` PRAGMA integrity, `identity_profile.txt` presence, `config.json` validity, legacy `~/.mempalace/` detection
+- PASS / WARN / FAIL / INFO per check; overall summary
+
+---
+
+## [4.0.0] — 2026-04-10 (session 7)
+
+### Phase 13 — Test Coverage & Quality Hardening ✅
+
+**Bug fix — `vault_graph.py`**
+- Fixed `SyntaxError`: `for i, da in enumerate(domains):` was at the same indentation as `if len(domains) >= 2:`, leaving the `if` body empty and the loop unconditional. Added 4-space indent to place the loop inside the `if` block.
+
+**`tests/test_migration.py`** (19 new tests)
+- `migrate_from_mempalace`: nothing-to-migrate, dry-run no-op, full migration (identity + config copied, keys remapped)
+- `_migrate_graph`: copy, skip-absent, skip-existing-without-force, force-overwrite, dry-run-no-op
+- `_migrate_identity`: copy, skip-absent, skip-existing, force-overwrite, dry-run-no-op
+- `_migrate_config`: key remapping (`palace_path`→`vault_path`, `topic_wings`→`topic_domains`, `hall_keywords`→`channel_keywords`), preserve-existing-keys, skip-absent, dry-run-no-op, malformed-JSON graceful failure
+- All tests patch module-level `Path` constants — never touch real `~/.mempalace` or `~/.recallos`
+
+**`tests/test_diagnostics.py`** (25 new tests)
+- `_check_vault_dir`: PASS / WARN (missing) / FAIL (is a file)
+- `_check_chroma_collection`: PASS, PASS+verbose count, FAIL on empty dir
+- `_check_incomplete_records`: INFO (None col), PASS (all complete), WARN (missing node), WARN (missing domain), verbose count, “+N more” sampling for >3 missing
+- `_check_recall_graph`: INFO (absent), PASS (valid schema), FAIL (corrupt file)
+- `_check_identity_profile`: WARN (absent), PASS (present with line count)
+- `_check_config_file`: INFO (absent), PASS (valid JSON with keys), FAIL (invalid JSON)
+- `_check_legacy_dir`: PASS (none), WARN (present with migrate hint)
+- `run_doctor`: required keys, valid overall status, always 7 checks, WARN/FAIL on empty vault, no FAILs with healthy vault
+- `os.path.expanduser` patching uses `_REAL_EXPANDUSER` captured at module import time to avoid `RecursionError` (patch replaces attribute on shared `os` module object)
+
+**Total tests: 54 (was 9)**
+
+---
+
 ## Remaining Work
 
 | Phase | Status | Description |
 |---|---|---|
-| 12 | ❌ Not started | New Features (migration tool, doctor command, multi-format ingest, etc.) |
+| — | — | All 13 phases complete. |
