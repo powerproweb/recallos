@@ -5,7 +5,7 @@ Thanks for wanting to help. RecallOS is open source and we welcome contributions
 ## Getting Started
 
 ```bash
-git clone https://github.com/milla-jovovich/recallos.git
+git clone https://github.com/powerproweb/recallos.git
 cd recallos
 pip install -e ".[dev]"    # installs with dev dependencies (pytest, build, twine)
 ```
@@ -84,7 +84,7 @@ assets/             ← logo + brand
 
 ## Good First Issues
 
-Check the [Issues](https://github.com/milla-jovovich/recallos/issues) tab. Great starting points:
+Check the [Issues](https://github.com/powerproweb/recallos/issues) tab. Great starting points:
 
 - **New chat formats**: Add import support for Cursor, Copilot, Notion, or other AI tool exports (`normalize.py`)
 - **Node detection**: Improve pattern matching in `node_detector_local.py`

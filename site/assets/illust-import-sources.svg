@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 345" fill="none">
+  <defs>
+    <radialGradient id="is-glow" cx="50%" cy="50%" r="45%">
+      <stop offset="0%" stop-color="#d4a843" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#080c1a" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="460" height="345" rx="14" fill="#0f1225"/>
+  <rect width="460" height="345" rx="14" fill="url(#is-glow)"/>
+
+  <!-- Central RecallOS hub -->
+  <circle cx="230" cy="172" r="38" stroke="#2ec4b6" stroke-width="2" fill="#2ec4b6" fill-opacity="0.08"/>
+  <circle cx="230" cy="172" r="24" stroke="#2ec4b6" stroke-width="1.5" fill="#2ec4b6" fill-opacity="0.15"/>
+  <text x="230" y="169" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" font-weight="700" fill="#2ec4b6">Recall</text>
+  <text x="230" y="181" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" font-weight="700" fill="#2ec4b6">OS</text>
+
+  <!-- Import source cards arranged in arc -->
+  <!-- ChatGPT -->
+  <rect x="50" y="60" width="72" height="32" rx="6" fill="#0f1225" stroke="#d4a843" stroke-opacity="0.5" stroke-width="1"/>
+  <text x="86" y="80" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="600" fill="#d4a843">ChatGPT</text>
+  <line x1="122" y1="80" x2="195" y2="148" stroke="#d4a843" stroke-opacity="0.3" stroke-width="1" stroke-dasharray="3 2"/>
+
+  <!-- Claude -->
+  <rect x="195" y="38" width="72" height="32" rx="6" fill="#0f1225" stroke="#2ec4b6" stroke-opacity="0.5" stroke-width="1"/>
+  <text x="231" y="58" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="600" fill="#2ec4b6">Claude</text>
+  <line x1="231" y1="70" x2="230" y2="134" stroke="#2ec4b6" stroke-opacity="0.3" stroke-width="1" stroke-dasharray="3 2"/>
+
+  <!-- Slack -->
+  <rect x="340" y="60" width="72" height="32" rx="6" fill="#0f1225" stroke="#d4a843" stroke-opacity="0.5" stroke-width="1"/>
+  <text x="376" y="80" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="600" fill="#d4a843">Slack</text>
+  <line x1="340" y1="80" x2="267" y2="148" stroke="#d4a843" stroke-opacity="0.3" stroke-width="1" stroke-dasharray="3 2"/>
+
+  <!-- Discord -->
+  <rect x="365" y="155" width="72" height="32" rx="6" fill="#0f1225" stroke="#2ec4b6" stroke-opacity="0.5" stroke-width="1"/>
+  <text x="401" y="175" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="600" fill="#2ec4b6">Discord</text>
+  <line x1="365" y1="171" x2="268" y2="172" stroke="#2ec4b6" stroke-opacity="0.3" stroke-width="1" stroke-dasharray="3 2"/>
+
+  <!-- Obsidian -->
+  <rect x="340" y="252" width="72" height="32" rx="6" fill="#0f1225" stroke="#d4a843" stroke-opacity="0.5" stroke-width="1"/>
+  <text x="376" y="272" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="600" fill="#d4a843">Obsidian</text>
+  <line x1="340" y1="264" x2="267" y2="196" stroke="#d4a843" stroke-opacity="0.3" stroke-width="1" stroke-dasharray="3 2"/>
+
+  <!-- Plain Text -->
+  <rect x="195" y="275" width="72" height="32" rx="6" fill="#0f1225" stroke="#2ec4b6" stroke-opacity="0.5" stroke-width="1"/>
+  <text x="231" y="295" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="600" fill="#2ec4b6">Plain Text</text>
+  <line x1="231" y1="275" x2="230" y2="210" stroke="#2ec4b6" stroke-opacity="0.3" stroke-width="1" stroke-dasharray="3 2"/>
+
+  <!-- Project Files -->
+  <rect x="50" y="252" width="72" height="32" rx="6" fill="#0f1225" stroke="#d4a843" stroke-opacity="0.5" stroke-width="1"/>
+  <text x="86" y="272" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="600" fill="#d4a843">Projects</text>
+  <line x1="122" y1="264" x2="195" y2="196" stroke="#d4a843" stroke-opacity="0.3" stroke-width="1" stroke-dasharray="3 2"/>
+
+  <!-- Arrow indicators at hub -->
+  <polygon points="200,155 207,150 207,160" fill="#2ec4b6" fill-opacity="0.5"/>
+  <polygon points="230,138 225,145 235,145" fill="#2ec4b6" fill-opacity="0.5"/>
+  <polygon points="260,155 253,150 253,160" fill="#2ec4b6" fill-opacity="0.5"/>
+
+  <!-- Title -->
+  <text x="230" y="25" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" font-weight="600" fill="#a8a4a0" letter-spacing="0.1em">7 IMPORT FORMATS</text>
+  <line x1="168" y1="32" x2="292" y2="32" stroke="#d4a843" stroke-opacity="0.25" stroke-width="0.8"/>
+</svg>

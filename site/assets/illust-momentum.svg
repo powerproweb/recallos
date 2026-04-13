@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 345" fill="none">
+  <defs>
+    <radialGradient id="mo-glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#2ec4b6" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#080c1a" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="mo-arrow" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#d4a843" stop-opacity="0.1"/>
+      <stop offset="50%" stop-color="#2ec4b6" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#2ec4b6" stop-opacity="0.9"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="460" height="345" rx="14" fill="#0f1225"/>
+  <rect width="460" height="345" rx="14" fill="url(#mo-glow)"/>
+
+  <!-- Title -->
+  <text x="230" y="35" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" font-weight="600" fill="#a8a4a0" letter-spacing="0.1em">RESUME ANY PROJECT</text>
+  <line x1="160" y1="42" x2="300" y2="42" stroke="#d4a843" stroke-opacity="0.25" stroke-width="0.8"/>
+
+  <!-- Timeline -->
+  <line x1="60" y1="172" x2="400" y2="172" stroke="#6b6662" stroke-opacity="0.3" stroke-width="1"/>
+
+  <!-- Session markers along timeline -->
+  <!-- Active sessions -->
+  <circle cx="90" cy="172" r="6" fill="#2ec4b6" fill-opacity="0.3" stroke="#2ec4b6" stroke-width="1"/>
+  <circle cx="130" cy="172" r="6" fill="#2ec4b6" fill-opacity="0.3" stroke="#2ec4b6" stroke-width="1"/>
+  <circle cx="165" cy="172" r="6" fill="#2ec4b6" fill-opacity="0.3" stroke="#2ec4b6" stroke-width="1"/>
+
+  <!-- Gap (dormant period) -->
+  <text x="215" y="168" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#6b6662">· · ·</text>
+  <text x="215" y="200" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#6b6662">3 months away</text>
+
+  <!-- Resume session (highlighted) -->
+  <circle cx="270" cy="172" r="8" fill="#2ec4b6" fill-opacity="0.15" stroke="#2ec4b6" stroke-width="2"/>
+  <circle cx="270" cy="172" r="3" fill="#2ec4b6"/>
+
+  <!-- Continued sessions -->
+  <circle cx="320" cy="172" r="6" fill="#d4a843" fill-opacity="0.3" stroke="#d4a843" stroke-width="1"/>
+  <circle cx="360" cy="172" r="6" fill="#d4a843" fill-opacity="0.3" stroke="#d4a843" stroke-width="1"/>
+
+  <!-- Arrow tip -->
+  <polygon points="395,172 385,164 385,180" fill="#d4a843" fill-opacity="0.5"/>
+
+  <!-- Date labels -->
+  <text x="130" y="145" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="7" fill="#6b6662">Jan 2026</text>
+  <text x="270" y="145" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="7" fill="#2ec4b6">Apr 2026</text>
+  <text x="360" y="145" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="7" fill="#d4a843" fill-opacity="0.6">May 2026</text>
+
+  <!-- Context loading visual at resume point -->
+  <rect x="238" y="220" width="110" height="65" rx="8" fill="#0f1225" stroke="#2ec4b6" stroke-opacity="0.3" stroke-width="1"/>
+  <line x1="270" y1="180" x2="270" y2="220" stroke="#2ec4b6" stroke-opacity="0.3" stroke-width="1" stroke-dasharray="3 2"/>
+  <text x="293" y="237" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" font-weight="600" fill="#2ec4b6">Context restored</text>
+  <text x="293" y="252" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#a8a4a0">✓ Team structure</text>
+  <text x="293" y="264" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#a8a4a0">✓ Last decisions</text>
+  <text x="293" y="276" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#a8a4a0">✓ Current sprint</text>
+
+  <!-- Before-resume state -->
+  <rect x="60" y="70" width="150" height="50" rx="8" fill="#1a0a12" stroke="#6b6662" stroke-opacity="0.2" stroke-width="0.8"/>
+  <text x="135" y="90" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#6b6662">Without RecallOS:</text>
+  <text x="135" y="106" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#6b6662" font-style="italic">"Where were we again?"</text>
+
+  <!-- After-resume state -->
+  <rect x="250" y="70" width="170" height="50" rx="8" fill="#0f1225" stroke="#2ec4b6" stroke-opacity="0.3" stroke-width="0.8"/>
+  <text x="335" y="90" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#2ec4b6">With RecallOS:</text>
+  <text x="335" y="106" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#2ec4b6" font-style="italic">"I see your last sprint. Let's go."</text>
+
+  <!-- Bottom note -->
+  <text x="230" y="325" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#6b6662" font-style="italic">Even months away, your AI picks up where you left off</text>
+</svg>

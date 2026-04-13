@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 345" fill="none">
+  <defs>
+    <radialGradient id="rg-glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#2ec4b6" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="#080c1a" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="460" height="345" rx="14" fill="#0f1225"/>
+  <rect width="460" height="345" rx="14" fill="url(#rg-glow)"/>
+
+  <!-- Title -->
+  <text x="230" y="35" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" font-weight="600" fill="#a8a4a0" letter-spacing="0.1em">TEMPORAL RECALL GRAPH</text>
+  <line x1="148" y1="42" x2="312" y2="42" stroke="#d4a843" stroke-opacity="0.25" stroke-width="0.8"/>
+
+  <!-- Entity nodes -->
+  <!-- Kai -->
+  <circle cx="130" cy="120" r="30" stroke="#2ec4b6" stroke-width="1.5" fill="#2ec4b6" fill-opacity="0.06"/>
+  <text x="130" y="117" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" font-weight="700" fill="#2ec4b6">Kai</text>
+  <text x="130" y="130" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#a8a4a0">backend</text>
+
+  <!-- Maya -->
+  <circle cx="330" cy="120" r="30" stroke="#2ec4b6" stroke-width="1.5" fill="#2ec4b6" fill-opacity="0.06"/>
+  <text x="330" y="117" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" font-weight="700" fill="#2ec4b6">Maya</text>
+  <text x="330" y="130" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#a8a4a0">infra</text>
+
+  <!-- Orion project -->
+  <circle cx="130" cy="250" r="30" stroke="#d4a843" stroke-width="1.5" fill="#d4a843" fill-opacity="0.06"/>
+  <text x="130" y="247" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" font-weight="700" fill="#d4a843">Orion</text>
+  <text x="130" y="260" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#a8a4a0">project</text>
+
+  <!-- Clerk -->
+  <circle cx="330" cy="250" r="30" stroke="#d4a843" stroke-width="1.5" fill="#d4a843" fill-opacity="0.06"/>
+  <text x="330" y="247" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" font-weight="700" fill="#d4a843">Clerk</text>
+  <text x="330" y="260" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#a8a4a0">auth</text>
+
+  <!-- Auth-migration (center) -->
+  <circle cx="230" cy="185" r="34" stroke="#2ec4b6" stroke-width="2" fill="#2ec4b6" fill-opacity="0.10"/>
+  <text x="230" y="182" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#f0ede8">auth</text>
+  <text x="230" y="194" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#f0ede8">migration</text>
+
+  <!-- Relationship edges -->
+  <!-- Kai → works_on → Orion -->
+  <line x1="130" y1="150" x2="130" y2="220" stroke="#2ec4b6" stroke-opacity="0.5" stroke-width="1.2"/>
+  <text x="108" y="188" font-family="Inter,sans-serif" font-size="7" fill="#2ec4b6" fill-opacity="0.7" transform="rotate(-90 108 188)">works_on</text>
+
+  <!-- Kai → recommended → Clerk -->
+  <line x1="155" y1="136" x2="305" y2="236" stroke="#d4a843" stroke-opacity="0.35" stroke-width="1" stroke-dasharray="4 3"/>
+  <text x="218" y="175" font-family="Inter,sans-serif" font-size="7" fill="#d4a843" fill-opacity="0.6" transform="rotate(33 218 175)">recommended</text>
+
+  <!-- Maya → assigned_to → auth-migration -->
+  <line x1="305" y1="135" x2="258" y2="168" stroke="#2ec4b6" stroke-opacity="0.4" stroke-width="1.2"/>
+  <text x="290" y="145" font-family="Inter,sans-serif" font-size="7" fill="#2ec4b6" fill-opacity="0.6">assigned</text>
+
+  <!-- auth-migration → Clerk -->
+  <line x1="255" y1="205" x2="305" y2="235" stroke="#d4a843" stroke-opacity="0.4" stroke-width="1.2"/>
+
+  <!-- Temporal validity badges -->
+  <rect x="62" y="183" width="50" height="14" rx="3" fill="#2ec4b6" fill-opacity="0.12" stroke="#2ec4b6" stroke-opacity="0.3" stroke-width="0.6"/>
+  <text x="87" y="193" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="6" fill="#2ec4b6" fill-opacity="0.8">current</text>
+
+  <rect x="350" y="145" width="60" height="14" rx="3" fill="#d4a843" fill-opacity="0.12" stroke="#d4a843" stroke-opacity="0.3" stroke-width="0.6"/>
+  <text x="380" y="155" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="6" fill="#d4a843" fill-opacity="0.8">2026-01</text>
+
+  <!-- Contradiction detection indicator -->
+  <rect x="155" y="300" width="150" height="22" rx="6" fill="#1a0a12" stroke="#d4a843" stroke-opacity="0.3" stroke-width="0.8"/>
+  <circle cx="170" cy="311" r="4" fill="#d4a843"/>
+  <text x="185" y="315" font-family="Inter,sans-serif" font-size="8" fill="#a8a4a0">Facts checked before answers</text>
+
+  <!-- Small junction dots -->
+  <circle cx="130" cy="150" r="2.5" fill="#2ec4b6"/>
+  <circle cx="130" cy="220" r="2.5" fill="#2ec4b6"/>
+  <circle cx="305" cy="135" r="2" fill="#2ec4b6"/>
+  <circle cx="305" cy="236" r="2" fill="#d4a843"/>
+</svg>

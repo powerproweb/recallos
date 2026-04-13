@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 345" fill="none">
+  <defs>
+    <radialGradient id="gr-glow" cx="50%" cy="60%" r="50%">
+      <stop offset="0%" stop-color="#2ec4b6" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#080c1a" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="gr-fill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2ec4b6" stop-opacity="0.20"/>
+      <stop offset="100%" stop-color="#2ec4b6" stop-opacity="0.02"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="460" height="345" rx="14" fill="#0f1225"/>
+  <rect width="460" height="345" rx="14" fill="url(#gr-glow)"/>
+
+  <!-- Title -->
+  <text x="230" y="35" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" font-weight="600" fill="#a8a4a0" letter-spacing="0.1em">COMPOUNDS OVER TIME</text>
+  <line x1="153" y1="42" x2="307" y2="42" stroke="#d4a843" stroke-opacity="0.25" stroke-width="0.8"/>
+
+  <!-- Axes -->
+  <line x1="70" y1="60" x2="70" y2="270" stroke="#6b6662" stroke-opacity="0.3" stroke-width="1"/>
+  <line x1="70" y1="270" x2="410" y2="270" stroke="#6b6662" stroke-opacity="0.3" stroke-width="1"/>
+
+  <!-- Y-axis label -->
+  <text x="30" y="165" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#6b6662" transform="rotate(-90 30 165)">AI usefulness</text>
+
+  <!-- X-axis label -->
+  <text x="240" y="295" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#6b6662">Time using RecallOS</text>
+
+  <!-- Grid lines (faint) -->
+  <line x1="70" y1="210" x2="410" y2="210" stroke="#6b6662" stroke-opacity="0.08" stroke-width="0.5"/>
+  <line x1="70" y1="150" x2="410" y2="150" stroke="#6b6662" stroke-opacity="0.08" stroke-width="0.5"/>
+  <line x1="70" y1="90" x2="410" y2="90" stroke="#6b6662" stroke-opacity="0.08" stroke-width="0.5"/>
+
+  <!-- Area fill under curve -->
+  <path d="M70,270 L70,255 C120,250 150,240 180,225 C210,210 240,185 270,155 C300,125 340,90 380,72 L410,65 L410,270 Z" fill="url(#gr-fill)"/>
+
+  <!-- Growth curve -->
+  <path d="M70,255 C120,250 150,240 180,225 C210,210 240,185 270,155 C300,125 340,90 380,72" stroke="#2ec4b6" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+
+  <!-- Data points on curve -->
+  <circle cx="100" cy="252" r="4" fill="#0f1225" stroke="#2ec4b6" stroke-width="1.5"/>
+  <circle cx="180" cy="225" r="4" fill="#0f1225" stroke="#2ec4b6" stroke-width="1.5"/>
+  <circle cx="270" cy="155" r="5" fill="#0f1225" stroke="#d4a843" stroke-width="2"/>
+  <circle cx="380" cy="72" r="5" fill="#0f1225" stroke="#d4a843" stroke-width="2"/>
+
+  <!-- Milestone labels -->
+  <text x="100" y="242" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#a8a4a0">Week 1</text>
+  <text x="100" y="232" text-anchor="middle" font-family="Inter,sans-serif" font-size="6" fill="#6b6662">50 records</text>
+
+  <text x="180" y="215" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#a8a4a0">Month 1</text>
+  <text x="180" y="205" text-anchor="middle" font-family="Inter,sans-serif" font-size="6" fill="#6b6662">500 records</text>
+
+  <text x="270" y="142" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" font-weight="600" fill="#d4a843">Month 3</text>
+  <text x="270" y="132" text-anchor="middle" font-family="Inter,sans-serif" font-size="6" fill="#d4a843" fill-opacity="0.7">2,000 records</text>
+
+  <text x="380" y="62" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" font-weight="600" fill="#d4a843">Month 6</text>
+  <text x="380" y="52" text-anchor="middle" font-family="Inter,sans-serif" font-size="6" fill="#d4a843" fill-opacity="0.7">5,000+ records</text>
+
+  <!-- Flat line comparison (without RecallOS) -->
+  <line x1="70" y1="255" x2="410" y2="250" stroke="#6b6662" stroke-opacity="0.3" stroke-width="1" stroke-dasharray="5 4"/>
+  <text x="410" y="260" font-family="Inter,sans-serif" font-size="7" fill="#6b6662" fill-opacity="0.5">without</text>
+
+  <!-- Bottom note -->
+  <text x="230" y="325" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#6b6662" font-style="italic">Every conversation makes the next one better</text>
+</svg>

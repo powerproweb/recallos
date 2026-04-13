@@ -532,26 +532,108 @@ section {
   margin-top: 0.45rem;
 }
 
-/* SVG placeholder illustration */
+/* Feature visual container */
 .feature-visual {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.illustration-placeholder {
+/* SVG section illustrations */
+.section-illustration {
   width: 100%;
   max-width: 460px;
-  aspect-ratio: 4 / 3;
-  background: var(--bg-card);
-  border: 1px solid var(--border-gold);
+  height: auto;
   border-radius: var(--card-radius);
+  transition: transform var(--transition-med);
+}
+
+.section-illustration:hover {
+  transform: scale(1.02);
+  cursor: zoom-in;
+}
+
+/* --- Lightbox Overlay ---------------------------------------------------- */
+.lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  background: rgba(8, 12, 26, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--transition-med), visibility var(--transition-med);
+}
+
+.lightbox-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.lightbox-inner {
+  position: relative;
+  width: 90vw;
+  max-width: 900px;
+  max-height: 85vh;
+}
+
+.lightbox-img {
+  width: 100%;
+  height: auto;
+  min-width: 800px;
+  border-radius: var(--card-radius);
+  box-shadow: 0 8px 60px rgba(46, 196, 182, 0.12), 0 0 0 1px var(--border-gold);
+  transition: transform var(--transition-med);
+}
+
+.lightbox-overlay.active .lightbox-img {
+  transform: scale(1);
+}
+
+.lightbox-close {
+  position: absolute;
+  top: -44px;
+  right: 0;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--border-gold);
+  border-radius: 50%;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 1.15rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.lightbox-close:hover {
+  background: var(--accent-gold);
+  border-color: var(--accent-gold);
+  color: var(--bg-base);
+}
+
+.lightbox-caption {
+  text-align: center;
+  margin-top: 0.75rem;
+  font-size: 0.82rem;
   color: var(--text-muted);
-  font-size: 0.85rem;
   font-style: italic;
+}
+
+/* Responsive: on narrow screens, allow image to shrink below 800px */
+@media (max-width: 860px) {
+  .lightbox-img {
+    min-width: 0;
+  }
+  .lightbox-inner {
+    width: 95vw;
+  }
 }
 
 /* --- Import Cards Row ---------------------------------------------------- */

@@ -10,18 +10,18 @@
   <meta property="og:type" content="website">
   <meta property="og:title" content="RecallOS — Your AI Remembers What Matters">
   <meta property="og:description" content="Save chats, files, and decisions on your own computer so your AI can find them later. Free, offline, open source.">
-  <meta property="og:image" content="/assets/og-card.png">
+  <meta property="og:image" content="assets/og-card.png">
   <meta property="og:url" content="https://quantumstoryforge.io/recallos/">
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="RecallOS — Your AI Remembers What Matters">
   <meta name="twitter:description" content="Local-first AI memory. No cloud. No subscription.">
-  <meta name="twitter:image" content="/assets/og-card.png">
+  <meta name="twitter:image" content="assets/og-card.png">
 
   <link rel="canonical" href="https://quantumstoryforge.io/recallos/">
-  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
-  <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
+  <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -179,7 +179,7 @@
             </ul>
           </div>
           <div class="feature-visual">
-            <div class="illustration-placeholder">[ Data Vault illustration ]</div>
+            <img src="assets/illust-data-vault.svg" alt="Data Vault structure diagram showing domains, nodes, channels, and cross-domain links" class="section-illustration" loading="lazy">
           </div>
         </div>
       </div>
@@ -206,7 +206,7 @@
             </div>
           </div>
           <div class="feature-visual">
-            <div class="illustration-placeholder">[ Import sources illustration ]</div>
+            <img src="assets/illust-import-sources.svg" alt="Seven import formats connecting to RecallOS: ChatGPT, Claude, Slack, Discord, Obsidian, Plain Text, Project Files" class="section-illustration" loading="lazy">
           </div>
         </div>
       </div>
@@ -240,7 +240,7 @@
             </div>
           </div>
           <div class="feature-visual">
-            <div class="illustration-placeholder">[ Memory layers illustration ]</div>
+            <img src="assets/illust-memory-layers.svg" alt="Four-layer memory stack: Identity, Core Context, Node Recall, and Deep Retrieval layers" class="section-illustration" loading="lazy">
           </div>
         </div>
       </div>
@@ -295,7 +295,7 @@
             </ul>
           </div>
           <div class="feature-visual">
-            <div class="illustration-placeholder">[ Recall Graph illustration ]</div>
+            <img src="assets/illust-recall-graph.svg" alt="Temporal Recall Graph showing entity relationships with time-based fact tracking" class="section-illustration" loading="lazy">
           </div>
         </div>
       </div>
@@ -475,6 +475,15 @@
       MIT License · © 2026 RecallOS · No tracking. No analytics. Your data stays yours.
     </div>
   </footer>
+
+  <!-- Lightbox Overlay -->
+  <div class="lightbox-overlay" id="lightbox" role="dialog" aria-modal="true" aria-label="Enlarged illustration">
+    <div class="lightbox-inner">
+      <button class="lightbox-close" aria-label="Close">&times;</button>
+      <img class="lightbox-img" src="" alt="">
+      <div class="lightbox-caption"></div>
+    </div>
+  </div>
 
   <!-- Back to Top -->
   <button class="back-to-top" aria-label="Back to top">↑</button>

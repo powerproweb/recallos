@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.9"
 license = "MIT"
 authors = [
-    {name = "milla-jovovich"},
+    {name = "powerproweb"},
 ]
 keywords = [
     "ai", "memory", "llm", "rag", "chromadb", "mcp",
@@ -35,9 +35,9 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/milla-jovovich/recallos"
-Repository = "https://github.com/milla-jovovich/recallos"
-"Bug Tracker" = "https://github.com/milla-jovovich/recallos/issues"
+Homepage = "https://github.com/powerproweb/recallos"
+Repository = "https://github.com/powerproweb/recallos"
+"Bug Tracker" = "https://github.com/powerproweb/recallos/issues"
 
 [tool.setuptools.packages.find]
 include = ["recallos*"]

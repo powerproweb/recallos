@@ -253,7 +253,7 @@ Additional `mcp_gateway.py` changes:
 - `version`: `"3.0.0"` → `"4.0.0"`
 - `description`: updated to `"RecallOS — Local-first AI memory operating system. No API key required."`
 - `keywords`: added `"recallos"`, `"recall-os"`, `"memory-os"`, `"agent-memory"`
-- `[project.urls]`: all three URLs updated from `milla-jovovich/mempalace` → `milla-jovovich/recallos`
+- `[project.urls]`: all three URLs updated to `powerproweb/recallos`
 - `[tool.setuptools.packages.find]`: `include = ["mempalace*"]` → `include = ["recallos*"]`
 - `[project.scripts]`: `mempalace = "mempalace:main"` → `recallos = "recallos:main"`
 - Verified: `import recallos`, `from recallos.config import RecallOSConfig`, and `from recallos import main` all resolve correctly
@@ -383,8 +383,54 @@ Every section updated:
 
 ---
 
+## [4.0.0] — 2026-04-10 (session 8)
+
+### Phase 14 — Landing Page & Site Build ✅
+
+**Two-page landing site built (`site/`):**
+- `index.html` — Features page: hero section, 4-card feature grid, Data Vault architecture, RecallScript compression, Memory Stack layers, benchmark results, full command reference, MCP tool listing
+- `benefits.html` — User Benefits page: problem statement, cost comparison, solo dev / team lead / MCP / local model use cases, "set it and forget it" workflow, data safety section
+- `css/styles.css` — Full design system: dark navy/maroon palette with gold and turquoise accents, responsive grid, card components, animated section transitions
+- `js/main.js` — Smooth scrolling, mobile nav toggle, section reveal animations
+- `site/assets/` — Generated SVG assets (logo, vault diagram, memory stack, graph visualization)
+- `generate_assets.py` — Python script to regenerate SVG assets
+- Error pages: `errors/404.html`, `errors/500.html`
+- SEO: `robots.txt`, `sitemap.xml`, `.htaccess` with caching and security headers
+- Navigation fixes: relative links between Features/Benefits pages, proper anchor scrolling
+
+**Deployment:**
+- Live at recallos.com via shared hosting
+- Canonical URLs and hotlink protection configured
+
+---
+
+## [4.0.0] — 2026-04-13 (session 9)
+
+### Phase 15 — Documentation Reorganization & Polish ✅
+
+**File reorganization:**
+- Moved all supplementary `.md` files into `01_all_md_files/` directory:
+  - `CHANGELOG.md`, `CONTRIBUTING.md`, `REBUILD_PLAN.md`
+  - `ReCallOS.features.readme.md`, `ReCallOS.user-benefits.readme.md`
+  - `recallos.landing-page-plan_BUILD.md`, `recallos.landing-page-plan_chatgpt.md`
+  - `recallos.web.gui.build.md`, `requirements.txt`
+- Root `README.md` retained as the sole GitHub-facing documentation
+
+**URL corrections:**
+- All GitHub URLs updated from `milla-jovovich/recallos` → `powerproweb/recallos` across:
+  - `pyproject.toml` (author + project URLs)
+  - `CHANGELOG.md`, `CONTRIBUTING.md`
+  - Root `README.md` (badge links)
+
+**README.md rewrite:**
+- Polished to world-class open-source standard
+- Updated documentation links to point to `01_all_md_files/`
+- All badge URLs corrected to `powerproweb/recallos`
+
+---
+
 ## Remaining Work
 
 | Phase | Status | Description |
 |---|---|---|
-| — | — | All 13 phases complete. |
+| — | — | All 15 phases complete. |

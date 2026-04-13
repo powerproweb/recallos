@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 345" fill="none">
+  <defs>
+    <radialGradient id="ml-glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#2ec4b6" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="#080c1a" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="ml-turq-fade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2ec4b6" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#2ec4b6" stop-opacity="0.03"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="460" height="345" rx="14" fill="#0f1225"/>
+  <rect width="460" height="345" rx="14" fill="url(#ml-glow)"/>
+
+  <!-- Title -->
+  <text x="230" y="35" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" font-weight="600" fill="#a8a4a0" letter-spacing="0.1em">4-LAYER MEMORY STACK</text>
+  <line x1="150" y1="42" x2="310" y2="42" stroke="#d4a843" stroke-opacity="0.25" stroke-width="0.8"/>
+
+  <!-- Layer 3 (bottom/deepest) — Deep Retrieval -->
+  <rect x="80" y="240" width="300" height="52" rx="10" fill="#0f1225" stroke="#6b6662" stroke-opacity="0.4" stroke-width="1"/>
+  <rect x="80" y="240" width="300" height="52" rx="10" fill="url(#ml-turq-fade)" opacity="0.3"/>
+  <text x="96" y="260" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#6b6662">L3</text>
+  <text x="120" y="260" font-family="Inter,sans-serif" font-size="10" font-weight="600" fill="#a8a4a0">Deep Retrieval</text>
+  <text x="120" y="278" font-family="Inter,sans-serif" font-size="8" fill="#6b6662">Semantic query across all summaries · on demand</text>
+  <text x="350" y="270" font-family="JetBrains Mono,monospace" font-size="8" fill="#6b6662" fill-opacity="0.6">∞ records</text>
+
+  <!-- Layer 2 — Node Recall -->
+  <rect x="80" y="178" width="300" height="52" rx="10" fill="#0f1225" stroke="#d4a843" stroke-opacity="0.3" stroke-width="1"/>
+  <rect x="80" y="178" width="300" height="52" rx="10" fill="url(#ml-turq-fade)" opacity="0.5"/>
+  <text x="96" y="198" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#d4a843">L2</text>
+  <text x="120" y="198" font-family="Inter,sans-serif" font-size="10" font-weight="600" fill="#d4a843">Node Recall</text>
+  <text x="120" y="216" font-family="Inter,sans-serif" font-size="8" fill="#a8a4a0" fill-opacity="0.7">Recent sessions, current project · on demand</text>
+  <text x="350" y="208" font-family="JetBrains Mono,monospace" font-size="8" fill="#d4a843" fill-opacity="0.5">~500 tok</text>
+
+  <!-- Layer 1 — Core Context -->
+  <rect x="80" y="116" width="300" height="52" rx="10" fill="#0f1225" stroke="#2ec4b6" stroke-opacity="0.4" stroke-width="1.2"/>
+  <rect x="80" y="116" width="300" height="52" rx="10" fill="url(#ml-turq-fade)" opacity="0.7"/>
+  <text x="96" y="136" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#2ec4b6">L1</text>
+  <text x="120" y="136" font-family="Inter,sans-serif" font-size="10" font-weight="600" fill="#2ec4b6">Core Context</text>
+  <text x="120" y="154" font-family="Inter,sans-serif" font-size="8" fill="#a8a4a0" fill-opacity="0.8">Team, projects, preferences · always loaded</text>
+  <text x="350" y="146" font-family="JetBrains Mono,monospace" font-size="8" fill="#2ec4b6" fill-opacity="0.6">~120 tok</text>
+
+  <!-- Layer 0 (top/lightest) — Identity -->
+  <rect x="80" y="56" width="300" height="50" rx="10" fill="#0f1225" stroke="#2ec4b6" stroke-width="1.5"/>
+  <rect x="80" y="56" width="300" height="50" rx="10" fill="#2ec4b6" fill-opacity="0.06"/>
+  <text x="96" y="76" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#2ec4b6">L0</text>
+  <text x="120" y="76" font-family="Inter,sans-serif" font-size="10" font-weight="700" fill="#f0ede8">Identity</text>
+  <text x="120" y="93" font-family="Inter,sans-serif" font-size="8" fill="#a8a4a0">Who is this AI? · always loaded</text>
+  <text x="350" y="84" font-family="JetBrains Mono,monospace" font-size="8" fill="#2ec4b6" fill-opacity="0.7">~50 tok</text>
+
+  <!-- Side annotation — bootstrap total -->
+  <line x1="395" y1="72" x2="420" y2="72" stroke="#d4a843" stroke-opacity="0.4" stroke-width="0.8"/>
+  <line x1="395" y1="140" x2="420" y2="140" stroke="#d4a843" stroke-opacity="0.4" stroke-width="0.8"/>
+  <line x1="420" y1="72" x2="420" y2="140" stroke="#d4a843" stroke-opacity="0.4" stroke-width="0.8"/>
+  <text x="430" y="110" font-family="Inter,sans-serif" font-size="8" font-weight="600" fill="#d4a843">~170</text>
+  <text x="430" y="120" font-family="Inter,sans-serif" font-size="7" fill="#d4a843" fill-opacity="0.7">tokens</text>
+
+  <!-- Bottom note -->
+  <text x="230" y="318" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#6b6662" font-style="italic">Bootstrap with L0 + L1, query deeper only when needed</text>
+</svg>

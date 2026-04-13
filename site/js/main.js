@@ -147,4 +147,62 @@
     }
   }
 
+  /* ---- Lightbox for section illustrations -------------------------------- */
+  var lightbox  = document.getElementById('lightbox');
+  var lbImg     = lightbox ? lightbox.querySelector('.lightbox-img') : null;
+  var lbCaption = lightbox ? lightbox.querySelector('.lightbox-caption') : null;
+  var lbClose   = lightbox ? lightbox.querySelector('.lightbox-close') : null;
+  var illustrationImgs = document.querySelectorAll('.section-illustration');
+
+  function openLightbox(src, alt) {
+    if (!lightbox || !lbImg) return;
+    lbImg.src = src;
+    lbImg.alt = alt;
+    lbCaption.textContent = alt;
+    lightbox.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    // Move focus into the dialog
+    lbClose.focus();
+  }
+
+  function closeLightbox() {
+    if (!lightbox) return;
+    lightbox.classList.remove('active');
+    document.body.style.overflow = '';
+    lbImg.src = '';
+  }
+
+  illustrationImgs.forEach(function (img) {
+    img.addEventListener('click', function () {
+      openLightbox(img.src, img.alt);
+    });
+    // Keyboard support
+    img.setAttribute('tabindex', '0');
+    img.setAttribute('role', 'button');
+    img.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openLightbox(img.src, img.alt);
+      }
+    });
+  });
+
+  if (lbClose) {
+    lbClose.addEventListener('click', closeLightbox);
+  }
+
+  // Close on overlay background click
+  if (lightbox) {
+    lightbox.addEventListener('click', function (e) {
+      if (e.target === lightbox) closeLightbox();
+    });
+  }
+
+  // Close on Escape key
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && lightbox && lightbox.classList.contains('active')) {
+      closeLightbox();
+    }
+  });
+
 })();

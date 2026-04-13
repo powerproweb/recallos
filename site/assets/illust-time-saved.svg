@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 345" fill="none">
+  <defs>
+    <radialGradient id="ts-glow" cx="50%" cy="50%" r="45%">
+      <stop offset="0%" stop-color="#2ec4b6" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="#080c1a" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="460" height="345" rx="14" fill="#0f1225"/>
+  <rect width="460" height="345" rx="14" fill="url(#ts-glow)"/>
+
+  <!-- Title -->
+  <text x="230" y="35" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" font-weight="600" fill="#a8a4a0" letter-spacing="0.1em">SKIP THE RE-EXPLAINING</text>
+  <line x1="153" y1="42" x2="307" y2="42" stroke="#d4a843" stroke-opacity="0.25" stroke-width="0.8"/>
+
+  <!-- Clock circle -->
+  <circle cx="170" cy="180" r="80" stroke="#2ec4b6" stroke-opacity="0.3" stroke-width="1.5" fill="#2ec4b6" fill-opacity="0.03"/>
+  <circle cx="170" cy="180" r="60" stroke="#2ec4b6" stroke-opacity="0.15" stroke-width="0.8"/>
+
+  <!-- Clock hour marks -->
+  <line x1="170" y1="105" x2="170" y2="115" stroke="#2ec4b6" stroke-opacity="0.5" stroke-width="1.5"/>
+  <line x1="170" y1="245" x2="170" y2="255" stroke="#2ec4b6" stroke-opacity="0.5" stroke-width="1.5"/>
+  <line x1="95" y1="180" x2="105" y2="180" stroke="#2ec4b6" stroke-opacity="0.5" stroke-width="1.5"/>
+  <line x1="235" y1="180" x2="245" y2="180" stroke="#2ec4b6" stroke-opacity="0.5" stroke-width="1.5"/>
+
+  <!-- Clock hands -->
+  <line x1="170" y1="180" x2="170" y2="130" stroke="#f0ede8" stroke-width="2" stroke-linecap="round"/>
+  <line x1="170" y1="180" x2="205" y2="165" stroke="#d4a843" stroke-width="1.5" stroke-linecap="round"/>
+  <circle cx="170" cy="180" r="4" fill="#2ec4b6"/>
+
+  <!-- Fast-forward arrows (showing skip) -->
+  <polygon points="280,150 310,172 280,194" fill="#2ec4b6" fill-opacity="0.3" stroke="#2ec4b6" stroke-width="1.2"/>
+  <polygon points="310,150 340,172 310,194" fill="#2ec4b6" fill-opacity="0.5" stroke="#2ec4b6" stroke-width="1.2"/>
+
+  <!-- "Before" block (crossed out) -->
+  <rect x="280" y="80" width="140" height="42" rx="8" fill="#1a0a12" stroke="#6b6662" stroke-opacity="0.3" stroke-width="0.8"/>
+  <text x="350" y="97" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#6b6662">"Let me explain the</text>
+  <text x="350" y="110" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#6b6662">project again..."</text>
+  <line x1="290" y1="85" x2="410" y2="118" stroke="#d4a843" stroke-opacity="0.4" stroke-width="1"/>
+
+  <!-- "After" block (highlighted) -->
+  <rect x="280" y="220" width="140" height="42" rx="8" fill="#0f1225" stroke="#2ec4b6" stroke-opacity="0.5" stroke-width="1.2"/>
+  <text x="350" y="237" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#2ec4b6">"Context loaded.</text>
+  <text x="350" y="250" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#2ec4b6">Ready to work."</text>
+
+  <!-- Arrow from before to after -->
+  <line x1="350" y1="126" x2="350" y2="215" stroke="#d4a843" stroke-opacity="0.25" stroke-width="1" stroke-dasharray="3 2"/>
+  <polygon points="345,215 350,222 355,215" fill="#d4a843" fill-opacity="0.4"/>
+
+  <!-- Token count badge -->
+  <rect x="290" y="270" width="120" height="20" rx="5" fill="#2ec4b6" fill-opacity="0.08" stroke="#2ec4b6" stroke-opacity="0.25" stroke-width="0.6"/>
+  <text x="350" y="284" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="#2ec4b6" fill-opacity="0.8">~170 tokens to start</text>
+
+  <!-- Bottom note -->
+  <text x="230" y="325" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#6b6662" font-style="italic">Your AI loads key facts automatically — no re-explaining</text>
+</svg>

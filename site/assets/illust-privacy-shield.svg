@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 345" fill="none">
+  <defs>
+    <radialGradient id="ps-glow" cx="50%" cy="45%" r="45%">
+      <stop offset="0%" stop-color="#2ec4b6" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="#080c1a" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="460" height="345" rx="14" fill="#0f1225"/>
+  <rect width="460" height="345" rx="14" fill="url(#ps-glow)"/>
+
+  <!-- Title -->
+  <text x="230" y="35" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" font-weight="600" fill="#a8a4a0" letter-spacing="0.1em">PRIVATE BY DESIGN</text>
+  <line x1="158" y1="42" x2="302" y2="42" stroke="#d4a843" stroke-opacity="0.25" stroke-width="0.8"/>
+
+  <!-- Shield shape -->
+  <path d="M230,60 L310,90 L310,180 C310,230 270,265 230,285 C190,265 150,230 150,180 L150,90 Z"
+        stroke="#2ec4b6" stroke-width="2" fill="#2ec4b6" fill-opacity="0.05"/>
+  <path d="M230,75 L295,100 L295,175 C295,218 262,248 230,265 C198,248 165,218 165,175 L165,100 Z"
+        stroke="#2ec4b6" stroke-opacity="0.3" stroke-width="1" fill="#2ec4b6" fill-opacity="0.03"/>
+
+  <!-- Lock icon in center of shield -->
+  <rect x="217" y="148" width="26" height="22" rx="4" fill="#2ec4b6" fill-opacity="0.15" stroke="#2ec4b6" stroke-width="1.5"/>
+  <path d="M222,148 L222,138 C222,131 226,126 230,126 C234,126 238,131 238,138 L238,148"
+        stroke="#2ec4b6" stroke-width="1.5" fill="none"/>
+  <circle cx="230" cy="158" r="2.5" fill="#2ec4b6"/>
+
+  <!-- "YOUR MACHINE" label inside shield -->
+  <text x="230" y="120" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" font-weight="700" fill="#f0ede8" letter-spacing="0.08em">YOUR</text>
+  <text x="230" y="132" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" font-weight="700" fill="#f0ede8" letter-spacing="0.08em">MACHINE</text>
+
+  <!-- Privacy guarantee badges around shield -->
+  <!-- No cloud -->
+  <rect x="30" y="100" width="95" height="28" rx="6" fill="#1a0a12" stroke="#d4a843" stroke-opacity="0.3" stroke-width="0.8"/>
+  <text x="77" y="110" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#6b6662">☁</text>
+  <line x1="72" y1="105" x2="82" y2="115" stroke="#d4a843" stroke-opacity="0.5" stroke-width="1"/>
+  <text x="77" y="122" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#d4a843">No cloud</text>
+
+  <!-- Works offline -->
+  <rect x="30" y="145" width="95" height="28" rx="6" fill="#0f1225" stroke="#2ec4b6" stroke-opacity="0.3" stroke-width="0.8"/>
+  <text x="77" y="163" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#2ec4b6">Works offline</text>
+
+  <!-- No telemetry -->
+  <rect x="30" y="190" width="95" height="28" rx="6" fill="#1a0a12" stroke="#d4a843" stroke-opacity="0.3" stroke-width="0.8"/>
+  <text x="77" y="208" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#d4a843">No telemetry</text>
+
+  <!-- No subscription -->
+  <rect x="335" y="100" width="95" height="28" rx="6" fill="#1a0a12" stroke="#d4a843" stroke-opacity="0.3" stroke-width="0.8"/>
+  <text x="382" y="118" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#d4a843">$0 forever</text>
+
+  <!-- MIT License -->
+  <rect x="335" y="145" width="95" height="28" rx="6" fill="#0f1225" stroke="#2ec4b6" stroke-opacity="0.3" stroke-width="0.8"/>
+  <text x="382" y="163" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#2ec4b6">MIT License</text>
+
+  <!-- No API key -->
+  <rect x="335" y="190" width="95" height="28" rx="6" fill="#1a0a12" stroke="#d4a843" stroke-opacity="0.3" stroke-width="0.8"/>
+  <text x="382" y="208" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#d4a843">No API key</text>
+
+  <!-- Connecting lines from badges to shield -->
+  <line x1="125" y1="114" x2="150" y2="120" stroke="#d4a843" stroke-opacity="0.15" stroke-width="0.6"/>
+  <line x1="125" y1="159" x2="150" y2="155" stroke="#2ec4b6" stroke-opacity="0.15" stroke-width="0.6"/>
+  <line x1="125" y1="204" x2="150" y2="190" stroke="#d4a843" stroke-opacity="0.15" stroke-width="0.6"/>
+  <line x1="335" y1="114" x2="310" y2="120" stroke="#d4a843" stroke-opacity="0.15" stroke-width="0.6"/>
+  <line x1="335" y1="159" x2="310" y2="155" stroke="#2ec4b6" stroke-opacity="0.15" stroke-width="0.6"/>
+  <line x1="335" y1="204" x2="310" y2="190" stroke="#d4a843" stroke-opacity="0.15" stroke-width="0.6"/>
+
+  <!-- Bottom note -->
+  <text x="230" y="320" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#6b6662" font-style="italic">Your data never leaves your machine. Ever.</text>
+</svg>
