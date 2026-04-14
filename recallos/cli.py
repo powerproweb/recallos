@@ -39,6 +39,7 @@ def cmd_init(args):
     from pathlib import Path
     from .entity_detector import scan_for_detection, detect_entities, confirm_entities
     from .node_detector_local import detect_nodes_local
+    from .exceptions import DirectoryNotFoundError
 
     # Pass 1: auto-detect people and projects from file content
     print(f"\n  Scanning for entities in: {args.dir}")
@@ -59,51 +60,70 @@ def cmd_init(args):
             print("  No entities detected — proceeding with directory-based rooms.")
 
     # Pass 2: detect nodes from folder structure
-    detect_nodes_local(project_dir=args.dir)
+    try:
+        detect_nodes_local(project_dir=args.dir)
+    except DirectoryNotFoundError as e:
+        print(f"\n  {e}")
+        sys.exit(1)
     RecallOSConfig().init()
 
 
 def cmd_mine(args):
+    from .exceptions import ConfigNotFoundError
+
     vault_path = os.path.expanduser(args.vault) if args.vault else RecallOSConfig().vault_path
 
-    if args.mode == "convos":
-        from .conversation_ingest import mine_convos
+    try:
+        if args.mode == "convos":
+            from .conversation_ingest import mine_convos
 
-        mine_convos(
-            convo_dir=args.dir,
-            vault_path=vault_path,
-            domain=args.domain,
-            agent=args.agent,
-            limit=args.limit,
-            dry_run=args.dry_run,
-            extract_mode=args.extract,
-            encode=getattr(args, "encode", False),
-        )
-    else:
-        from .ingest_engine import mine
+            mine_convos(
+                convo_dir=args.dir,
+                vault_path=vault_path,
+                domain=args.domain,
+                agent=args.agent,
+                limit=args.limit,
+                dry_run=args.dry_run,
+                extract_mode=args.extract,
+                encode=getattr(args, "encode", False),
+            )
+        else:
+            from .ingest_engine import mine
 
-        mine(
-            project_dir=args.dir,
-            vault_path=vault_path,
-            domain_override=args.domain,
-            agent=args.agent,
-            limit=args.limit,
-            dry_run=args.dry_run,
-            encode=getattr(args, "encode", False),
-        )
+            mine(
+                project_dir=args.dir,
+                vault_path=vault_path,
+                domain_override=args.domain,
+                agent=args.agent,
+                limit=args.limit,
+                dry_run=args.dry_run,
+                encode=getattr(args, "encode", False),
+            )
+    except ConfigNotFoundError as e:
+        print(f"\n  {e}")
+        sys.exit(1)
 
 
 def cmd_query(args):
     from .retrieval_engine import search
+    from .exceptions import VaultNotFoundError, QueryError
 
     vault_path = os.path.expanduser(args.vault) if args.vault else RecallOSConfig().vault_path
-    search(
-        query=args.query,
-        vault_path=vault_path,
-        domain=args.domain,
-        node=args.node,
-        n_results=args.results,
-    )
+    try:
+        search(
+            query=args.query,
+            vault_path=vault_path,
+            domain=args.domain,
+            node=args.node,
+            n_results=args.results,
+        )
+    except VaultNotFoundError as e:
+        print(f"\n  {e}")
+        print("  Run: recallos init <dir> then recallos ingest <dir>")
+        sys.exit(1)
+    except QueryError as e:
+        print(f"\n  {e}")
+        sys.exit(1)
 
 
 def cmd_bootstrap(args):

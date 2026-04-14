@@ -4,4 +4,5 @@ build/
 __pycache__/
 *.pyc
 .pytest_cache/
+node_modules/
 mempal.yaml

@@ -215,8 +215,14 @@ def print_proposed_structure(project_name: str, nodes: list, total_files: int, s
     print(f"\n{'â”€' * 55}")
 
 
-def get_user_approval(nodes: list) -> list:
-    """Same approval flow as AI version."""
+def get_user_approval(nodes: list, interactive: bool = True) -> list:
+    """Same approval flow as AI version.
+
+    When interactive=False, accepts all nodes without prompting.
+    """
+    if not interactive:
+        return nodes
+
     print("  Review the proposed nodes above.")
     print("  Options:")
     print("    [enter]  Accept all nodes")
@@ -267,14 +273,23 @@ def save_config(project_dir: str, project_name: str, nodes: list):
     print(f"\n{'=' * 55}\n")
 
 
-def detect_nodes_local(project_dir: str):
-    """Main entry point for local setup."""
+def detect_nodes_local(project_dir: str, interactive: bool = True):
+    """Main entry point for local setup.
+
+    Args:
+        project_dir: Path to the project directory.
+        interactive: If False, auto-accepts all detected nodes without prompting.
+
+    Raises:
+        DirectoryNotFoundError: if project_dir does not exist.
+    """
+    from .exceptions import DirectoryNotFoundError
+
     project_path = Path(project_dir).expanduser().resolve()
     project_name = project_path.name.lower().replace(" ", "_").replace("-", "_")
 
     if not project_path.exists():
-        print(f"ERROR: Directory not found: {project_dir}")
-        sys.exit(1)
+        raise DirectoryNotFoundError(project_dir)
 
     # Count files
     from .ingest_engine import scan_project
@@ -296,5 +311,5 @@ def detect_nodes_local(project_dir: str):
         source = "fallback (flat project)"
 
     print_proposed_structure(project_name, nodes, len(files), source)
-    approved_nodes = get_user_approval(nodes)
+    approved_nodes = get_user_approval(nodes, interactive=interactive)
     save_config(project_dir, project_name, approved_nodes)

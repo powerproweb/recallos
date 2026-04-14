@@ -64,8 +64,13 @@ MIN_CHUNK_SIZE = 50  # skip tiny chunks
 
 
 def load_config(project_dir: str) -> dict:
-    """Load recallos.yaml from project directory (falls back to mempal.yaml)."""
+    """Load recallos.yaml from project directory (falls back to mempal.yaml).
+
+    Raises:
+        ConfigNotFoundError: if neither recallos.yaml nor mempal.yaml exists.
+    """
     import yaml
+    from .exceptions import ConfigNotFoundError
 
     config_path = Path(project_dir).expanduser().resolve() / "recallos.yaml"
     if not config_path.exists():
@@ -74,9 +79,7 @@ def load_config(project_dir: str) -> dict:
         if legacy_path.exists():
             config_path = legacy_path
         else:
-            print(f"ERROR: No recallos.yaml found in {project_dir}")
-            print(f"Run: recallos init {project_dir}")
-            sys.exit(1)
+            raise ConfigNotFoundError(project_dir)
     with open(config_path) as f:
         return yaml.safe_load(f)
 
