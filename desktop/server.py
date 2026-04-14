@@ -9,11 +9,13 @@ Responsibilities:
 
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
+from desktop.auth import require_session_token, TOKEN_HEADER
 from desktop.routes import status as status_routes
+from desktop.routes import network as network_routes
 
 # ---------------------------------------------------------------------------
 # App factory
@@ -31,16 +33,19 @@ def create_app() -> FastAPI:
         redoc_url=None,
     )
 
-    # CORS — only allow the local pywebview origin
+    # CORS — restrict to localhost origins, expose session-token header
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],  # tightened in Phase 0.2 with session token
+        allow_origins=["http://127.0.0.1", "http://localhost"],
+        allow_origin_regex=r"^http://(127\.0\.0\.1|localhost)(:\d+)?$",
         allow_methods=["*"],
-        allow_headers=["*"],
+        allow_headers=["*", TOKEN_HEADER],
     )
 
-    # --- API routes ---------------------------------------------------------
-    app.include_router(status_routes.router, prefix="/api")
+    # --- API routes (all require session token) -----------------------------
+    api_deps = [Depends(require_session_token)]
+    app.include_router(status_routes.router, prefix="/api", dependencies=api_deps)
+    app.include_router(network_routes.router, prefix="/api", dependencies=api_deps)
 
     # --- Static frontend ----------------------------------------------------
     if STATIC_DIR.is_dir():
