@@ -5,24 +5,27 @@ retrieval_engine.py — Semantic retrieval from the Data Vault.
 Returns verbatim text — the actual words, never summaries.
 """
 
-import sys
 from pathlib import Path
 
 import chromadb
+
+from .exceptions import VaultNotFoundError, QueryError
 
 
 def search(query: str, vault_path: str, domain: str = None, node: str = None, n_results: int = 5):
     """
     Query the Data Vault. Returns verbatim source record content.
     Optionally filter by domain (project) or node (topic).
+
+    Raises:
+        VaultNotFoundError: if the vault or collection is missing.
+        QueryError: if the ChromaDB query fails.
     """
     try:
         client = chromadb.PersistentClient(path=vault_path)
         col = client.get_collection("recallos_records")
-    except Exception:
-        print(f"\n  No Data Vault found at {vault_path}")
-        print("  Run: recallos init <dir> then recallos ingest <dir>")
-        sys.exit(1)
+    except Exception as e:
+        raise VaultNotFoundError(vault_path, str(e))
 
     # Build where filter
     where = {}
@@ -45,8 +48,7 @@ def search(query: str, vault_path: str, domain: str = None, node: str = None, n_
         results = col.query(**kwargs)
 
     except Exception as e:
-        print(f"\n  Query error: {e}")
-        sys.exit(1)
+        raise QueryError(str(e))
 
     docs = results["documents"][0]
     metas = results["metadatas"][0]

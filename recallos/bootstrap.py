@@ -370,25 +370,40 @@ def run_onboarding(
     directory: str = ".",
     config_dir: Path = None,
     auto_detect: bool = True,
+    interactive: bool = True,
+    mode: str = None,
+    people: list = None,
+    projects: list = None,
+    domains: list = None,
 ) -> EntityRegistry:
     """
     Run the full onboarding flow.
     Returns the seeded EntityRegistry.
+
+    When interactive=False, uses the provided mode/people/projects/domains
+    (or defaults) and skips all input() prompts.  Safe for service/API callers.
     """
-    # Step 1: Mode
-    mode = _ask_mode()
+    if not interactive:
+        mode = mode or "combo"
+        people = people or []
+        aliases = {}
+        projects = projects or []
+        domains = domains or DEFAULT_DOMAINS[mode]
+    else:
+        # Step 1: Mode
+        mode = _ask_mode()
 
-    # Step 2: People
-    people, aliases = _ask_people(mode)
+        # Step 2: People
+        people, aliases = _ask_people(mode)
 
-    # Step 3: Projects
-    projects = _ask_projects(mode)
+        # Step 3: Projects
+        projects = _ask_projects(mode)
 
-    # Step 4: Domains (stored in config, not registry -- just show user)
-    domains = _ask_domains(mode)
+        # Step 4: Domains (stored in config, not registry -- just show user)
+        domains = _ask_domains(mode)
 
     # Step 5: Auto-detect additional people from files
-    if auto_detect and _yn("\nScan your files for additional names we might have missed?"):
+    if interactive and auto_detect and _yn("\nScan your files for additional names we might have missed?"):
         directory = _ask("Directory to scan", default=directory)
         detected = _auto_detect(directory, people)
         if detected:
@@ -420,9 +435,9 @@ def run_onboarding(
                         )
                         people.append({"name": e["name"], "relationship": rel, "context": ctx})
 
-    # Step 6: Warn about ambiguous names
+    # Step 6: Warn about ambiguous names (skip printing when non-interactive)
     ambiguous = _warn_ambiguous(people)
-    if ambiguous:
+    if interactive and ambiguous:
         _hr()
         print(f"""
   Heads up Ã¢â‚¬â€ these names are also common English words:
