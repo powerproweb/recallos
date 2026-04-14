@@ -17,7 +17,7 @@ from pathlib import Path
 DB_DIR = Path(os.path.expanduser("~/.recallos"))
 DB_PATH = DB_DIR / "desktop.db"
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 
 # ---------------------------------------------------------------------------
 # Schema DDL
@@ -77,6 +77,16 @@ CREATE TABLE IF NOT EXISTS audit_log (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
     action      TEXT    NOT NULL,
     detail      TEXT,
+    created_at  TEXT    NOT NULL DEFAULT (datetime('now'))
+);
+
+-- Network activity log (Phase 0.2 — sovereignty guardrails)
+CREATE TABLE IF NOT EXISTS network_log (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    feature     TEXT    NOT NULL,
+    host        TEXT    NOT NULL,
+    path        TEXT    NOT NULL DEFAULT '',
+    allowed     INTEGER NOT NULL,
     created_at  TEXT    NOT NULL DEFAULT (datetime('now'))
 );
 """

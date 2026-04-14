@@ -12,6 +12,8 @@ import threading
 
 import uvicorn
 
+from desktop.auth import generate_session_token
+
 
 def _find_free_port() -> int:
     """Bind to port 0 and let the OS assign an available port."""
@@ -24,6 +26,9 @@ def main():
     """Entry point for ``recallos-desktop``."""
     port = _find_free_port()
     host = "127.0.0.1"
+
+    # --- Generate per-session auth token ------------------------------------
+    token = generate_session_token()
 
     # --- Start Uvicorn in a daemon thread -----------------------------------
     server_config = uvicorn.Config(
@@ -44,7 +49,7 @@ def main():
         print("pywebview is not installed.  Install it with:\n  pip install recallos[desktop]")
         sys.exit(1)
 
-    url = f"http://{host}:{port}"
+    url = f"http://{host}:{port}?token={token}"
     webview.create_window(
         "RecallOS",
         url=url,

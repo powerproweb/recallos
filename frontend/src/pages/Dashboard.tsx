@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { apiGet } from "../api/client";
 
 interface CheckResult {
   status: string;
@@ -26,11 +27,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/status")
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.json();
-      })
+    apiGet<StatusResponse>("/api/status")
       .then(setStatus)
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
