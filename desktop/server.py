@@ -14,8 +14,9 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
 from desktop.auth import require_session_token, TOKEN_HEADER
-from desktop.routes import status as status_routes
+from desktop.routes import models as models_routes
 from desktop.routes import network as network_routes
+from desktop.routes import status as status_routes
 
 # ---------------------------------------------------------------------------
 # App factory
@@ -46,6 +47,7 @@ def create_app() -> FastAPI:
     api_deps = [Depends(require_session_token)]
     app.include_router(status_routes.router, prefix="/api", dependencies=api_deps)
     app.include_router(network_routes.router, prefix="/api", dependencies=api_deps)
+    app.include_router(models_routes.router, prefix="/api", dependencies=api_deps)
 
     # --- Static frontend ----------------------------------------------------
     if STATIC_DIR.is_dir():
