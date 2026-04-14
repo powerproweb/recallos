@@ -8,7 +8,6 @@ Stores verbatim chunks as source records. No summaries. Ever.
 """
 
 import os
-import sys
 import hashlib
 from pathlib import Path
 from datetime import datetime

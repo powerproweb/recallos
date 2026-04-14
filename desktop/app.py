@@ -41,14 +41,11 @@ def main():
     try:
         import webview  # pywebview
     except ImportError:
-        print(
-            "pywebview is not installed.  Install it with:\n"
-            "  pip install recallos[desktop]"
-        )
+        print("pywebview is not installed.  Install it with:\n  pip install recallos[desktop]")
         sys.exit(1)
 
     url = f"http://{host}:{port}"
-    window = webview.create_window(
+    webview.create_window(
         "RecallOS",
         url=url,
         width=1280,

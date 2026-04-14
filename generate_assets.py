@@ -8,15 +8,15 @@ OUT = os.path.join(os.path.dirname(__file__), "site", "assets")
 os.makedirs(OUT, exist_ok=True)
 
 # Brand colors
-BG       = (8, 12, 26)
-MAROON   = (26, 10, 18)
-GOLD     = (212, 168, 67)
+BG = (8, 12, 26)
+MAROON = (26, 10, 18)
+GOLD = (212, 168, 67)
 GOLD_DIM = (140, 110, 44)
-TURQ     = (46, 196, 182)
+TURQ = (46, 196, 182)
 TURQ_DIM = (30, 120, 112)
-WHITE    = (240, 237, 232)
-GRAY     = (168, 164, 160)
-CARD_BG  = (15, 18, 37)
+WHITE = (240, 237, 232)
+GRAY = (168, 164, 160)
+CARD_BG = (15, 18, 37)
 
 
 def blend(c1, c2, t):
@@ -73,8 +73,10 @@ def generate_og_card():
 
     # Decorative hexagons (faint)
     for hx, hy, hr, col in [
-        (900, 120, 60, TURQ_DIM), (950, 400, 45, GOLD_DIM),
-        (180, 480, 50, TURQ_DIM), (120, 150, 35, GOLD_DIM),
+        (900, 120, 60, TURQ_DIM),
+        (950, 400, 45, GOLD_DIM),
+        (180, 480, 50, TURQ_DIM),
+        (120, 150, 35, GOLD_DIM),
         (1050, 280, 30, TURQ_DIM),
     ]:
         draw_hexagon(draw, hx, hy, hr, outline=col, width=1)
@@ -125,12 +127,17 @@ def generate_og_card():
     vw = bbox[2] - bbox[0]
     vh = bbox[3] - bbox[1]
     vx, vy = W - vw - 30, 20
-    draw.rounded_rectangle([vx - 8, vy - 4, vx + vw + 8, vy + vh + 4],
-                           radius=6, fill=CARD_BG, outline=GOLD_DIM, width=1)
+    draw.rounded_rectangle(
+        [vx - 8, vy - 4, vx + vw + 8, vy + vh + 4],
+        radius=6,
+        fill=CARD_BG,
+        outline=GOLD_DIM,
+        width=1,
+    )
     draw.text((vx, vy), ver, fill=GOLD, font=font_tag)
 
     img.save(os.path.join(OUT, "og-card.png"), "PNG")
-    print(f"  ✔ og-card.png (1200×630)")
+    print("  ✔ og-card.png (1200×630)")
 
 
 # ==========================================================================
@@ -165,7 +172,7 @@ def generate_apple_touch_icon():
     draw.line([(S - 8, S - 8), (S - 8, S - 30)], fill=GOLD, width=2)
 
     img.save(os.path.join(OUT, "apple-touch-icon.png"), "PNG")
-    print(f"  ✔ apple-touch-icon.png (180×180)")
+    print("  ✔ apple-touch-icon.png (180×180)")
 
 
 # ==========================================================================
@@ -183,8 +190,15 @@ def generate_favicon():
         r_inner = int(s * 0.28)
 
         draw_hexagon(draw, cx, cy, r_outer, outline=TURQ + (255,), width=max(1, s // 16))
-        draw_hexagon(draw, cx, cy, r_inner, fill=TURQ_DIM + (255,), outline=TURQ + (255,),
-                     width=max(1, s // 20))
+        draw_hexagon(
+            draw,
+            cx,
+            cy,
+            r_inner,
+            fill=TURQ_DIM + (255,),
+            outline=TURQ + (255,),
+            width=max(1, s // 20),
+        )
 
         if s >= 32:
             try:
@@ -193,8 +207,7 @@ def generate_favicon():
                 font = ImageFont.load_default()
             bbox = draw.textbbox((0, 0), "R", font=font)
             tw, th = bbox[2] - bbox[0], bbox[3] - bbox[1]
-            draw.text(((s - tw) // 2, (s - th) // 2 - 1), "R",
-                      fill=WHITE + (255,), font=font)
+            draw.text(((s - tw) // 2, (s - th) // 2 - 1), "R", fill=WHITE + (255,), font=font)
 
         frames.append(img)
 
@@ -205,7 +218,7 @@ def generate_favicon():
         sizes=[(s, s) for s in sizes],
         append_images=frames[1:],
     )
-    print(f"  ✔ favicon.ico (16+32+48)")
+    print("  ✔ favicon.ico (16+32+48)")
 
 
 # ==========================================================================

@@ -7,7 +7,6 @@ Responsibilities:
   - Bind exclusively to 127.0.0.1 (never 0.0.0.0)
 """
 
-import os
 from pathlib import Path
 
 from fastapi import FastAPI

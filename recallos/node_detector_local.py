@@ -10,7 +10,6 @@ No internet. No API key. Your files stay on your machine.
 """
 
 import os
-import sys
 import yaml
 from pathlib import Path
 from collections import defaultdict

@@ -403,7 +403,11 @@ def run_onboarding(
         domains = _ask_domains(mode)
 
     # Step 5: Auto-detect additional people from files
-    if interactive and auto_detect and _yn("\nScan your files for additional names we might have missed?"):
+    if (
+        interactive
+        and auto_detect
+        and _yn("\nScan your files for additional names we might have missed?")
+    ):
         directory = _ask("Directory to scan", default=directory)
         detected = _auto_detect(directory, people)
         if detected:
