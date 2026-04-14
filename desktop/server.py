@@ -7,6 +7,7 @@ Responsibilities:
   - Bind exclusively to 127.0.0.1 (never 0.0.0.0)
 """
 
+import sys
 from pathlib import Path
 
 from fastapi import Depends, FastAPI
@@ -22,7 +23,11 @@ from desktop.routes import status as status_routes
 # App factory
 # ---------------------------------------------------------------------------
 
-STATIC_DIR = Path(__file__).parent / "static"
+# In a PyInstaller bundle, data files live under sys._MEIPASS
+if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
+    STATIC_DIR = Path(sys._MEIPASS) / "desktop" / "static"
+else:
+    STATIC_DIR = Path(__file__).parent / "static"
 
 
 def create_app() -> FastAPI:
