@@ -6,6 +6,7 @@ then opens a pywebview native window pointing at that server.
 Closing the window shuts down the server gracefully.
 """
 
+import multiprocessing
 import socket
 import sys
 import threading
@@ -24,6 +25,8 @@ def _find_free_port() -> int:
 
 def main():
     """Entry point for ``recallos-desktop``."""
+    multiprocessing.freeze_support()  # required for Windows frozen exe
+
     port = _find_free_port()
     host = "127.0.0.1"
 
@@ -31,12 +34,25 @@ def main():
     token = generate_session_token()
 
     # --- Start Uvicorn in a daemon thread -----------------------------------
-    server_config = uvicorn.Config(
-        "desktop.server:app",
-        host=host,
-        port=port,
-        log_level="warning",
-    )
+    # When running inside a PyInstaller bundle, string-based import
+    # ("desktop.server:app") fails because PyInstaller's importer can't
+    # resolve it.  Pass the WSGI/ASGI app object directly instead.
+    if getattr(sys, "frozen", False):
+        from desktop.server import app as _app
+
+        server_config = uvicorn.Config(
+            _app,
+            host=host,
+            port=port,
+            log_level="warning",
+        )
+    else:
+        server_config = uvicorn.Config(
+            "desktop.server:app",
+            host=host,
+            port=port,
+            log_level="warning",
+        )
     server = uvicorn.Server(server_config)
 
     thread = threading.Thread(target=server.run, daemon=True)
