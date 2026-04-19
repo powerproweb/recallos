@@ -17,6 +17,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from desktop.auth import require_session_token, TOKEN_HEADER
 from desktop.routes import models as models_routes
 from desktop.routes import network as network_routes
+from desktop.routes import search as search_routes
 from desktop.routes import status as status_routes
 
 # ---------------------------------------------------------------------------
@@ -51,6 +52,7 @@ def create_app() -> FastAPI:
     # --- API routes (all require session token) -----------------------------
     api_deps = [Depends(require_session_token)]
     app.include_router(status_routes.router, prefix="/api", dependencies=api_deps)
+    app.include_router(search_routes.router, prefix="/api", dependencies=api_deps)
     app.include_router(network_routes.router, prefix="/api", dependencies=api_deps)
     app.include_router(models_routes.router, prefix="/api", dependencies=api_deps)
 

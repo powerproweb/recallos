@@ -33,6 +33,22 @@ export async function apiGet<T = unknown>(path: string): Promise<T> {
 }
 
 /**
+ * Convenience: POST JSON to an API path.
+ */
+export async function apiPost<T = unknown>(
+  path: string,
+  body: unknown,
+): Promise<T> {
+  const res = await apiFetch(path, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json() as Promise<T>;
+}
+
+/**
  * Convenience: PUT JSON to an API path.
  */
 export async function apiPut<T = unknown>(
