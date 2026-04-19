@@ -19,6 +19,7 @@ from desktop.routes import models as models_routes
 from desktop.routes import network as network_routes
 from desktop.routes import search as search_routes
 from desktop.routes import status as status_routes
+from desktop.routes import upload as upload_routes
 
 # ---------------------------------------------------------------------------
 # App factory
@@ -54,6 +55,7 @@ def create_app() -> FastAPI:
     app.include_router(status_routes.router, prefix="/api", dependencies=api_deps)
     app.include_router(search_routes.router, prefix="/api", dependencies=api_deps)
     app.include_router(network_routes.router, prefix="/api", dependencies=api_deps)
+    app.include_router(upload_routes.router, prefix="/api", dependencies=api_deps)
     app.include_router(models_routes.router, prefix="/api", dependencies=api_deps)
 
     # --- Static frontend ----------------------------------------------------
