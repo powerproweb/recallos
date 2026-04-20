@@ -6,6 +6,7 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 
 from desktop.db import get_connection, init_db
+from desktop.security import audit_action
 
 router = APIRouter(tags=["settings"])
 
@@ -28,6 +29,7 @@ def get_all_settings():
 @router.put("/settings")
 def update_setting(body: SettingsUpdate):
     """Update a single setting."""
+    audit_action("settings_change", f"{body.key}={body.value}")
     init_db()
     conn = get_connection()
     conn.execute(

@@ -6,6 +6,7 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
 
+from desktop.security import audit_action, validate_path, PathNotAllowedError
 from desktop.services.backup_service import backup, restore, list_backups
 from desktop.services.logging_service import log_frontend_error
 
@@ -15,6 +16,7 @@ router = APIRouter(tags=["backups"])
 @router.post("/backups/create")
 def create_backup():
     """Create a new backup ZIP."""
+    audit_action("backup", "manual backup created")
     return backup()
 
 
@@ -31,6 +33,11 @@ class RestoreRequest(BaseModel):
 @router.post("/backups/restore")
 def restore_backup(body: RestoreRequest):
     """Restore from a backup ZIP."""
+    try:
+        validate_path(body.path)
+    except PathNotAllowedError:
+        return {"status": "error", "message": "Path outside allowed directories"}
+    audit_action("restore", f"restored from {body.path}")
     return restore(body.path)
 
 

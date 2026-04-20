@@ -5,6 +5,7 @@
 import chromadb
 from fastapi import APIRouter, Query
 
+from desktop.security import audit_action
 from recallos.config import RecallOSConfig
 
 router = APIRouter(tags=["export"])
@@ -14,6 +15,7 @@ _config = RecallOSConfig()
 @router.get("/export/vault")
 def export_vault(domain: str = Query(default=None)):
     """Export all vault records as JSON."""
+    audit_action("export", f"vault export (domain={domain})")
     try:
         client = chromadb.PersistentClient(path=_config.vault_path)
         col = client.get_collection("recallos_records")
@@ -38,6 +40,7 @@ def export_vault(domain: str = Query(default=None)):
 @router.get("/export/recallscript")
 def export_recallscript(domain: str = Query(default=None)):
     """Export RecallScript-encoded records (if available)."""
+    audit_action("export", f"recallscript export (domain={domain})")
     try:
         client = chromadb.PersistentClient(path=_config.vault_path)
         col = client.get_collection("recallos_encoded")
