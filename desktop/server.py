@@ -10,15 +10,24 @@ Responsibilities:
 import sys
 from pathlib import Path
 
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, Request
+from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
 
 from desktop.auth import require_session_token, TOKEN_HEADER
+from desktop.routes import download as download_routes
+from desktop.routes import graph as graph_routes
+from desktop.routes import mcp as mcp_routes
 from desktop.routes import models as models_routes
 from desktop.routes import network as network_routes
 from desktop.routes import search as search_routes
+from desktop.routes import settings as settings_routes
 from desktop.routes import status as status_routes
+from desktop.routes import support as support_routes
+from desktop.routes import backups as backups_routes
+from desktop.routes import provenance as provenance_routes
 from desktop.routes import upload as upload_routes
 
 # ---------------------------------------------------------------------------
@@ -32,6 +41,28 @@ else:
     STATIC_DIR = Path(__file__).parent / "static"
 
 
+# ---------------------------------------------------------------------------
+# Route whitelist middleware
+# ---------------------------------------------------------------------------
+
+_ALLOWED_PREFIXES = ("/api/", "/api/docs", "/api/openapi.json")
+
+
+class RouteWhitelistMiddleware(BaseHTTPMiddleware):
+    """Reject requests to unknown paths — only /api/* and static assets pass."""
+
+    async def dispatch(self, request: Request, call_next):
+        path = request.url.path
+        # Allow API routes
+        if path.startswith(_ALLOWED_PREFIXES):
+            return await call_next(request)
+        # Allow static assets (handled by StaticFiles mount at /)
+        if not path.startswith("/api"):
+            return await call_next(request)
+        # Block unregistered /api paths
+        return JSONResponse(status_code=404, content={"detail": "Not found"})
+
+
 def create_app() -> FastAPI:
     """Build and return the FastAPI application."""
     app = FastAPI(
@@ -40,6 +71,9 @@ def create_app() -> FastAPI:
         docs_url="/api/docs",
         redoc_url=None,
     )
+
+    # Route whitelist — reject unknown paths before other middleware
+    app.add_middleware(RouteWhitelistMiddleware)
 
     # CORS — restrict to localhost origins, expose session-token header
     app.add_middleware(
@@ -54,9 +88,16 @@ def create_app() -> FastAPI:
     api_deps = [Depends(require_session_token)]
     app.include_router(status_routes.router, prefix="/api", dependencies=api_deps)
     app.include_router(search_routes.router, prefix="/api", dependencies=api_deps)
-    app.include_router(network_routes.router, prefix="/api", dependencies=api_deps)
     app.include_router(upload_routes.router, prefix="/api", dependencies=api_deps)
+    app.include_router(download_routes.router, prefix="/api", dependencies=api_deps)
+    app.include_router(graph_routes.router, prefix="/api", dependencies=api_deps)
+    app.include_router(network_routes.router, prefix="/api", dependencies=api_deps)
     app.include_router(models_routes.router, prefix="/api", dependencies=api_deps)
+    app.include_router(settings_routes.router, prefix="/api", dependencies=api_deps)
+    app.include_router(support_routes.router, prefix="/api", dependencies=api_deps)
+    app.include_router(backups_routes.router, prefix="/api", dependencies=api_deps)
+    app.include_router(provenance_routes.router, prefix="/api", dependencies=api_deps)
+    app.include_router(mcp_routes.router, prefix="/api", dependencies=api_deps)
 
     # --- Static frontend ----------------------------------------------------
     if STATIC_DIR.is_dir():
