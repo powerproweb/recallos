@@ -140,10 +140,13 @@ def test_build_graph_missing_domain_excluded():
 
 
 def test_build_graph_no_collection_returns_empty():
-    nodes, edges = build_graph(col=None, config=None)
-    # _get_collection will fail without a real vault → returns ({}, [])
+    # Use an explicit empty collection instead of relying on _get_collection
+    # fallback which reads the user's real vault and is non-deterministic.
+    client, col, tmpdir = _make_col([])
+    nodes, edges = build_graph(col=col)
     assert nodes == {}
     assert edges == []
+    _cleanup(client, tmpdir)
 
 
 def test_build_graph_multiple_channels_multiple_edges():
