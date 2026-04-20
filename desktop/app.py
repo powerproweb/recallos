@@ -17,6 +17,7 @@ import uvicorn
 from desktop.auth import generate_session_token
 from desktop.crash import check_unclean_shutdown, clear_running, mark_running, write_crash_dump
 from desktop.services.logging_service import init_logging
+from desktop.tray import start_tray, stop_tray
 
 logger = logging.getLogger("app")
 
@@ -87,6 +88,9 @@ def main():
         min_size=(900, 600),
     )
 
+    # --- System tray (optional) ----------------------------------------------
+    start_tray()
+
     # webview.start() blocks until the window is closed
     try:
         webview.start()
@@ -95,6 +99,7 @@ def main():
         raise
     finally:
         # --- Graceful shutdown -----------------------------------------------
+        stop_tray()
         server.should_exit = True
         thread.join(timeout=3)
         clear_running()
