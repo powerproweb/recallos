@@ -54,6 +54,8 @@ desktop = [
     "pywebview>=5.0",
     "aiosqlite>=0.20",
     "python-multipart>=0.0.9",
+    "pystray>=0.19; sys_platform == 'win32'",
+    "Pillow>=10.0",
 ]
 
 [tool.ruff]

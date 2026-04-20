@@ -28,7 +28,9 @@ from desktop.routes import status as status_routes
 from desktop.routes import support as support_routes
 from desktop.routes import backups as backups_routes
 from desktop.routes import provenance as provenance_routes
+from desktop.routes import updater as updater_routes
 from desktop.routes import upload as upload_routes
+from desktop.routes import vault_lock as vault_lock_routes
 
 # ---------------------------------------------------------------------------
 # App factory
@@ -97,6 +99,8 @@ def create_app() -> FastAPI:
     app.include_router(support_routes.router, prefix="/api", dependencies=api_deps)
     app.include_router(backups_routes.router, prefix="/api", dependencies=api_deps)
     app.include_router(provenance_routes.router, prefix="/api", dependencies=api_deps)
+    app.include_router(updater_routes.router, prefix="/api", dependencies=api_deps)
+    app.include_router(vault_lock_routes.router, prefix="/api", dependencies=api_deps)
     app.include_router(mcp_routes.router, prefix="/api", dependencies=api_deps)
 
     # --- Static frontend ----------------------------------------------------
