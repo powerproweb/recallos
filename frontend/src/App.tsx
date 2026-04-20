@@ -3,13 +3,23 @@ import Dashboard from "./pages/Dashboard";
 import Search from "./pages/Search";
 import Upload from "./pages/Upload";
 import Download from "./pages/Download";
+import Graph from "./pages/Graph";
+import Network from "./pages/Network";
+import Models from "./pages/Models";
+import Support from "./pages/Support";
+import MCP from "./pages/MCP";
 import Settings from "./pages/Settings";
 
 const NAV_ITEMS = [
   { to: "/", label: "Dashboard" },
   { to: "/search", label: "Search" },
   { to: "/upload", label: "Upload" },
-  { to: "/download", label: "Download" },
+  { to: "/download", label: "Export" },
+  { to: "/graph", label: "Graph" },
+  { to: "/network", label: "Network" },
+  { to: "/models", label: "Models" },
+  { to: "/support", label: "Support" },
+  { to: "/mcp", label: "MCP" },
   { to: "/settings", label: "Settings" },
 ];
 
@@ -66,6 +76,11 @@ export default function App() {
           <Route path="/search" element={<Search />} />
           <Route path="/upload" element={<Upload />} />
           <Route path="/download" element={<Download />} />
+          <Route path="/graph" element={<Graph />} />
+          <Route path="/network" element={<Network />} />
+          <Route path="/models" element={<Models />} />
+          <Route path="/support" element={<Support />} />
+          <Route path="/mcp" element={<MCP />} />
           <Route path="/settings" element={<Settings />} />
         </Routes>
       </main>

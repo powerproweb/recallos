@@ -160,7 +160,8 @@ def _migrate_chroma(dry_run: bool, force: bool) -> dict:
                 break
 
             try:
-                if embeddings:
+                has_embeddings = embeddings is not None and len(embeddings) > 0
+                if has_embeddings:
                     dst_col.upsert(
                         ids=ids,
                         documents=docs,

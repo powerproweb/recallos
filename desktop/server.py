@@ -15,10 +15,15 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
 from desktop.auth import require_session_token, TOKEN_HEADER
+from desktop.routes import download as download_routes
+from desktop.routes import graph as graph_routes
+from desktop.routes import mcp as mcp_routes
 from desktop.routes import models as models_routes
 from desktop.routes import network as network_routes
 from desktop.routes import search as search_routes
+from desktop.routes import settings as settings_routes
 from desktop.routes import status as status_routes
+from desktop.routes import support as support_routes
 from desktop.routes import upload as upload_routes
 
 # ---------------------------------------------------------------------------
@@ -54,9 +59,14 @@ def create_app() -> FastAPI:
     api_deps = [Depends(require_session_token)]
     app.include_router(status_routes.router, prefix="/api", dependencies=api_deps)
     app.include_router(search_routes.router, prefix="/api", dependencies=api_deps)
-    app.include_router(network_routes.router, prefix="/api", dependencies=api_deps)
     app.include_router(upload_routes.router, prefix="/api", dependencies=api_deps)
+    app.include_router(download_routes.router, prefix="/api", dependencies=api_deps)
+    app.include_router(graph_routes.router, prefix="/api", dependencies=api_deps)
+    app.include_router(network_routes.router, prefix="/api", dependencies=api_deps)
     app.include_router(models_routes.router, prefix="/api", dependencies=api_deps)
+    app.include_router(settings_routes.router, prefix="/api", dependencies=api_deps)
+    app.include_router(support_routes.router, prefix="/api", dependencies=api_deps)
+    app.include_router(mcp_routes.router, prefix="/api", dependencies=api_deps)
 
     # --- Static frontend ----------------------------------------------------
     if STATIC_DIR.is_dir():
