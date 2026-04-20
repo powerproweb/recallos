@@ -2,7 +2,6 @@
 /api/export — Export vault data in various formats.
 """
 
-
 import chromadb
 from fastapi import APIRouter, Query
 

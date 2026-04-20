@@ -24,6 +24,7 @@ from desktop.routes import search as search_routes
 from desktop.routes import settings as settings_routes
 from desktop.routes import status as status_routes
 from desktop.routes import support as support_routes
+from desktop.routes import backups as backups_routes
 from desktop.routes import upload as upload_routes
 
 # ---------------------------------------------------------------------------
@@ -66,6 +67,7 @@ def create_app() -> FastAPI:
     app.include_router(models_routes.router, prefix="/api", dependencies=api_deps)
     app.include_router(settings_routes.router, prefix="/api", dependencies=api_deps)
     app.include_router(support_routes.router, prefix="/api", dependencies=api_deps)
+    app.include_router(backups_routes.router, prefix="/api", dependencies=api_deps)
     app.include_router(mcp_routes.router, prefix="/api", dependencies=api_deps)
 
     # --- Static frontend ----------------------------------------------------

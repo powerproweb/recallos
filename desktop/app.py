@@ -6,6 +6,7 @@ then opens a pywebview native window pointing at that server.
 Closing the window shuts down the server gracefully.
 """
 
+import logging
 import multiprocessing
 import socket
 import sys
@@ -14,6 +15,10 @@ import threading
 import uvicorn
 
 from desktop.auth import generate_session_token
+from desktop.crash import check_unclean_shutdown, clear_running, mark_running, write_crash_dump
+from desktop.services.logging_service import init_logging
+
+logger = logging.getLogger("app")
 
 
 def _find_free_port() -> int:
@@ -26,6 +31,14 @@ def _find_free_port() -> int:
 def main():
     """Entry point for ``recallos-desktop``."""
     multiprocessing.freeze_support()  # required for Windows frozen exe
+
+    # --- Structured logging -------------------------------------------------
+    init_logging()
+
+    # --- Unclean shutdown detection -----------------------------------------
+    if check_unclean_shutdown():
+        logger.warning("Previous session did not exit cleanly")
+    mark_running()
 
     port = _find_free_port()
     host = "127.0.0.1"
@@ -75,12 +88,22 @@ def main():
     )
 
     # webview.start() blocks until the window is closed
-    webview.start()
-
-    # --- Graceful shutdown ---------------------------------------------------
-    server.should_exit = True
-    thread.join(timeout=3)
+    try:
+        webview.start()
+    except Exception as exc:
+        write_crash_dump(exc)
+        raise
+    finally:
+        # --- Graceful shutdown -----------------------------------------------
+        server.should_exit = True
+        thread.join(timeout=3)
+        clear_running()
+        logger.info("RecallOS Desktop shut down cleanly")
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as exc:
+        write_crash_dump(exc)
+        raise
