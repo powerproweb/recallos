@@ -36,6 +36,9 @@ READABLE_EXTENSIONS = {
     ".csv",
     ".sql",
     ".toml",
+    # Document formats (Phase 3 — extracted via recallos.extractors)
+    ".pdf",
+    ".docx",
 }
 
 SKIP_DIRS = {
@@ -271,10 +274,19 @@ def process_file(
     if not dry_run and file_already_mined(collection, source_file):
         return 0
 
-    try:
-        content = filepath.read_text(encoding="utf-8", errors="replace")
-    except Exception:
-        return 0
+    # Use extractor for binary formats (PDF, DOCX); read_text for everything else
+    from .extractors import can_extract, extract_text as _extract
+
+    if can_extract(filepath):
+        try:
+            content = _extract(filepath)
+        except Exception:
+            return 0
+    else:
+        try:
+            content = filepath.read_text(encoding="utf-8", errors="replace")
+        except Exception:
+            return 0
 
     content = content.strip()
     if len(content) < MIN_CHUNK_SIZE:

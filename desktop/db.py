@@ -80,6 +80,16 @@ CREATE TABLE IF NOT EXISTS audit_log (
     created_at  TEXT    NOT NULL DEFAULT (datetime('now'))
 );
 
+-- Saved searches (Phase 3.3)
+CREATE TABLE IF NOT EXISTS saved_searches (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    query       TEXT    NOT NULL,
+    domain      TEXT,
+    node        TEXT,
+    name        TEXT,
+    created_at  TEXT    NOT NULL DEFAULT (datetime('now'))
+);
+
 -- Network activity log (Phase 0.2 — sovereignty guardrails)
 CREATE TABLE IF NOT EXISTS network_log (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
