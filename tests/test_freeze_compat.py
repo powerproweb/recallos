@@ -77,24 +77,33 @@ def test_spec_references_desktop_app():
 
 
 def test_spec_includes_static_data():
-    """The spec file bundles desktop/static/ as data."""
-    spec_path = Path(__file__).resolve().parent.parent / "recallos_desktop.spec"
-    content = spec_path.read_text()
-    assert "static" in content
+    """The packaging config bundles desktop/static/ as data."""
+    import sys
+
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "packaging"))
+    from common import STATIC_FILES
+
+    assert "static" in STATIC_FILES[0]
 
 
 def test_spec_includes_chromadb_hidden_imports():
-    """The spec file includes critical chromadb hidden imports."""
-    spec_path = Path(__file__).resolve().parent.parent / "recallos_desktop.spec"
-    content = spec_path.read_text()
-    assert "chromadb.utils.embedding_functions.onnx_mini_lm_l6_v2" in content
-    assert "chromadb.telemetry.product.posthog" in content
-    assert "chromadb.db.impl.sqlite" in content
+    """The packaging config includes critical chromadb hidden imports."""
+    import sys
+
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "packaging"))
+    from common import ALL_HIDDEN
+
+    assert "chromadb.utils.embedding_functions.onnx_mini_lm_l6_v2" in ALL_HIDDEN
+    assert "chromadb.telemetry.product.posthog" in ALL_HIDDEN
+    assert "chromadb.db.impl.sqlite" in ALL_HIDDEN
 
 
 def test_spec_includes_uvicorn_hidden_imports():
-    """The spec file includes critical uvicorn hidden imports."""
-    spec_path = Path(__file__).resolve().parent.parent / "recallos_desktop.spec"
-    content = spec_path.read_text()
-    assert "uvicorn.protocols.http.auto" in content
-    assert "uvicorn.lifespan.on" in content
+    """The packaging config includes critical uvicorn hidden imports."""
+    import sys
+
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "packaging"))
+    from common import ALL_HIDDEN
+
+    assert "uvicorn.protocols.http.auto" in ALL_HIDDEN
+    assert "uvicorn.lifespan.on" in ALL_HIDDEN
