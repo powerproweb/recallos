@@ -751,7 +751,7 @@ def handle_request(request):
             "result": {
                 "protocolVersion": "2024-11-05",
                 "capabilities": {"tools": {}},
-                "serverInfo": {"name": "recallos", "version": "4.1.0"},
+                "serverInfo": {"name": "recallos", "version": "4.2.0"},
             },
         }
     elif method == "notifications/initialized":

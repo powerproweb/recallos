@@ -376,7 +376,7 @@ PRs welcome. See [CONTRIBUTING.md](01_all_md_files/CONTRIBUTING.md) for setup an
 MIT — see [LICENSE](LICENSE).
 
 <!-- Link Definitions -->
-[version-shield]: https://img.shields.io/badge/version-4.1.0-4dc9f6?style=flat-square&labelColor=0a0e14
+[version-shield]: https://img.shields.io/badge/version-4.2.0-4dc9f6?style=flat-square&labelColor=0a0e14
 [release-link]: https://github.com/powerproweb/recallos/releases
 [python-shield]: https://img.shields.io/badge/python-3.9+-7dd8f8?style=flat-square&labelColor=0a0e14&logo=python&logoColor=7dd8f8
 [python-link]: https://www.python.org/
