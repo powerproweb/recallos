@@ -24,7 +24,8 @@ def _has_pystray() -> bool:
         import pystray  # noqa: F401
 
         return True
-    except ImportError:
+    except Exception:
+        # ImportError if not installed; Xlib.error.DisplayNameError on headless Linux
         return False
 
 
