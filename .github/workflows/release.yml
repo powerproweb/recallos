@@ -1,0 +1,45 @@
+name: Release Build
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            spec: recallos_desktop.spec
+            artifact: RecallOS-Windows
+          - os: macos-latest
+            spec: packaging/macos/recallos_macos.spec
+            artifact: RecallOS-macOS
+          - os: ubuntu-latest
+            spec: packaging/linux/recallos_linux.spec
+            artifact: RecallOS-Linux
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -e ".[dev,desktop]" pyinstaller
+
+      - name: Build with PyInstaller
+        run: python -m PyInstaller ${{ matrix.spec }} --noconfirm
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: dist/RecallOS/
+          retention-days: 14

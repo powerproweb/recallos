@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=RecallOS
+Comment=Local-first AI memory operating system
+Exec=RecallOS
+Icon=recallos
+Categories=Utility;Development;
+Terminal=false
