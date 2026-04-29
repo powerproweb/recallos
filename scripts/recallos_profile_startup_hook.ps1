@@ -11,7 +11,7 @@ if ((Test-Path $recallosHealthPython) -and (Test-Path $recallosHealthScript)) {
     try {
         $env:PYTHONUTF8 = "1"
         $env:PYTHONIOENCODING = "utf-8"
-        $healthOutput = & $recallosHealthPython $recallosHealthScript --json 2>&1
+        $healthOutput = & $recallosHealthPython $recallosHealthScript --timeout 60 --json --auto-repair-mcp 2>&1
         $checkExitCode = $LASTEXITCODE
         $healthOutput | Out-File -FilePath $recallosHealthLog -Encoding utf8
         if ($checkExitCode -eq 0) {
@@ -35,5 +35,4 @@ if ((Test-Path $recallosHealthPython) -and (Test-Path $recallosHealthScript)) {
     }
 } else {
     Write-Warning "[RecallOS] Health check skipped (missing python or script path)."
-}
 }

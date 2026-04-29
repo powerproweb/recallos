@@ -259,6 +259,26 @@ claude mcp add recallos -- python -m recallos.mcp_gateway
 
 The AI learns RecallScript and the memory protocol automatically from `recallos_status`.
 
+### Warp MCP auto-repair (startup-safe)
+RecallOS includes a self-healing MCP check for Warp in `scripts/check_recallos_health.py`.
+When run with `--auto-repair-mcp`, it validates and repairs `~/.warp/.mcp.json` before the normal health checks:
+1. Load existing MCP config and detect wrapper style (`mcpServers`, `mcp_servers`, `servers`, `mcp.servers`, or flat map).
+2. Ensure a canonical `recallos` stdio server entry exists:
+   - `command`: Python executable
+   - `args`: `["-m", "recallos.mcp_gateway"]`
+   - `env`: `PYTHONUTF8=1`, `PYTHONIOENCODING=utf-8`, `RECALLOS_VAULT_PATH=<vault>`
+3. Preserve other MCP servers and only repair/create the `recallos` entry.
+4. If JSON is malformed, save a backup as `~/.warp/.mcp.json.broken-<UTCSTAMP>.bak`, then rewrite a valid config.
+
+Run manually:
+```bash
+python scripts/check_recallos_health.py --auto-repair-mcp --json
+```
+
+Startup usage:
+- `scripts/recallos_profile_startup_hook.ps1` runs this check with `--auto-repair-mcp`.
+- The same invocation is mirrored in the shell profile to keep RecallOS MCP connected each session.
+
 ---
 
 ## Benchmarks

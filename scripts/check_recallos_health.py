@@ -8,11 +8,13 @@ Checks:
   2. RecallOS vault is reachable via ChromaDB and collection metadata is readable.
   3. MCP gateway handles initialize/tools/list/recallos_status/recallos_query.
   4. MCP-reported total_records matches direct vault count.
+  5. (optional) Auto-repair drifted/missing RecallOS MCP config before checks.
 
 Examples:
   python scripts/check_recallos_health.py
   python scripts/check_recallos_health.py --query "auth decisions"
   python scripts/check_recallos_health.py --json
+  python scripts/check_recallos_health.py --auto-repair-mcp
 """
 
 from __future__ import annotations
@@ -22,6 +24,7 @@ import json
 import os
 import subprocess
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -29,6 +32,12 @@ DEFAULT_QUERY = "health check recallos memory"
 PASS = "PASS"
 FAIL = "FAIL"
 WARN = "WARN"
+RECALLOS_SERVER_NAME = "recallos"
+RECALLOS_GATEWAY_ARGS = ["-m", "recallos.mcp_gateway"]
+REQUIRED_MCP_ENV = {
+    "PYTHONIOENCODING": "utf-8",
+    "PYTHONUTF8": "1",
+}
 
 
 def _line(status: str, label: str, detail: str = "") -> None:
@@ -51,7 +60,7 @@ def _recognized_server_map(config: dict[str, Any]) -> dict[str, Any]:
     return {
         k: v
         for k, v in config.items()
-        if isinstance(v, dict) and ("command" in v or "url" in v or "args" in v)
+        if isinstance(v, dict) and ("command" in v or "url" in v or "args" in v or "warp_id" in v)
     }
 
 
@@ -62,23 +71,121 @@ def _load_json_file(path: Path) -> dict[str, Any]:
     return data
 
 
-def _resolve_vault_and_collection(server: dict[str, Any]) -> tuple[str, str]:
+def _load_recallos_file_config() -> tuple[str, str]:
     config_path = Path.home() / ".recallos" / "config.json"
-    file_vault = os.path.expanduser("~/.recallos/vault")
-    file_collection = "recallos_records"
+    vault_path = os.path.expanduser("~/.recallos/vault")
+    collection_name = "recallos_records"
     if config_path.exists():
         try:
             cfg = _load_json_file(config_path)
-            file_vault = cfg.get("vault_path", file_vault)
-            file_collection = cfg.get("collection_name", file_collection)
+            vault_path = cfg.get("vault_path", vault_path)
+            collection_name = cfg.get("collection_name", collection_name)
         except Exception:
             # Keep resilient defaults if config is malformed.
             pass
+    return vault_path, collection_name
 
+
+def _resolve_vault_and_collection(server: dict[str, Any]) -> tuple[str, str]:
+    file_vault, file_collection = _load_recallos_file_config()
     env = server.get("env", {})
     if isinstance(env, dict) and env.get("RECALLOS_VAULT_PATH"):
         return env["RECALLOS_VAULT_PATH"], file_collection
     return file_vault, file_collection
+
+
+def _resolve_server_container_for_write(config: dict[str, Any]) -> tuple[dict[str, Any], str]:
+    if isinstance(config.get("mcpServers"), dict):
+        return config["mcpServers"], "mcpServers"
+    if isinstance(config.get("mcp_servers"), dict):
+        return config["mcp_servers"], "mcp_servers"
+    if isinstance(config.get("servers"), dict):
+        return config["servers"], "servers"
+    if isinstance(config.get("mcp"), dict):
+        mcp_block = config["mcp"]
+        if isinstance(mcp_block.get("servers"), dict):
+            return mcp_block["servers"], "mcp.servers"
+    flat_servers = _recognized_server_map(config)
+    if flat_servers:
+        return config, "flat"
+    config["mcpServers"] = {}
+    return config["mcpServers"], "mcpServers"
+
+
+def _canonicalize_recallos_server(
+    existing_server: Any, fallback_python_command: str, vault_path: str
+) -> dict[str, Any]:
+    server = existing_server.copy() if isinstance(existing_server, dict) else {}
+    command = server.get("command")
+    if not isinstance(command, str) or not command.strip():
+        command = fallback_python_command
+    server["command"] = command
+    server["args"] = list(RECALLOS_GATEWAY_ARGS)
+    env_value = server.get("env")
+    env: dict[str, str] = (
+        {k: v for k, v in env_value.items() if isinstance(k, str) and isinstance(v, str)}
+        if isinstance(env_value, dict)
+        else {}
+    )
+    env.update(REQUIRED_MCP_ENV)
+    env["RECALLOS_VAULT_PATH"] = vault_path
+    server["env"] = env
+    for conflict_key in ("url", "headers", "warp_id"):
+        server.pop(conflict_key, None)
+    return server
+
+
+def _repair_warp_mcp_config(
+    mcp_path: Path, fallback_python_command: str
+) -> tuple[bool, str]:
+    existed_before = mcp_path.exists()
+    repair_notes: list[str] = []
+
+    if existed_before:
+        try:
+            config = _load_json_file(mcp_path)
+        except Exception as exc:
+            broken_backup_path = mcp_path.with_name(
+                f"{mcp_path.name}.broken-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}.bak"
+            )
+            broken_backup_path.write_text(
+                mcp_path.read_text(encoding="utf-8", errors="replace"),
+                encoding="utf-8",
+            )
+            config = {}
+            repair_notes.append(
+                f"existing file was invalid JSON ({exc}); backup saved to {broken_backup_path}"
+            )
+    else:
+        config = {}
+
+    if not isinstance(config, dict):
+        config = {}
+        repair_notes.append("existing config root was not an object; reset to object")
+
+    vault_path, _ = _load_recallos_file_config()
+    server_container, wrapper_name = _resolve_server_container_for_write(config)
+    previous_server = server_container.get(RECALLOS_SERVER_NAME)
+    repaired_server = _canonicalize_recallos_server(
+        previous_server, fallback_python_command, vault_path
+    )
+
+    changed = not existed_before or previous_server != repaired_server
+    if changed:
+        server_container[RECALLOS_SERVER_NAME] = repaired_server
+        mcp_path.parent.mkdir(parents=True, exist_ok=True)
+        mcp_path.write_text(json.dumps(config, indent=2) + "\n", encoding="utf-8")
+        detail = (
+            f"repaired {mcp_path} using wrapper '{wrapper_name}'"
+            if existed_before
+            else f"created {mcp_path} with wrapper '{wrapper_name}'"
+        )
+    else:
+        detail = f"recallos MCP entry already healthy in {mcp_path} (wrapper '{wrapper_name}')"
+
+    if repair_notes:
+        detail = f"{detail}; " + "; ".join(repair_notes)
+    return changed, detail
 
 
 def _check_vault(vault_path: str, collection_name: str) -> tuple[bool, dict[str, Any]]:
@@ -111,8 +218,8 @@ def _build_mcp_env(server: dict[str, Any]) -> dict[str, str]:
         for k, v in server_env.items():
             if isinstance(k, str) and isinstance(v, str):
                 env[k] = v
-    env.setdefault("PYTHONUTF8", "1")
-    env.setdefault("PYTHONIOENCODING", "utf-8")
+    for env_key, env_value in REQUIRED_MCP_ENV.items():
+        env.setdefault(env_key, env_value)
     return env
 
 
@@ -245,16 +352,41 @@ def main() -> int:
     parser.add_argument(
         "--timeout",
         type=int,
-        default=15,
-        help="Timeout in seconds for MCP process round-trip (default: 15)",
+        default=60,
+        help="Timeout in seconds for MCP process round-trip (default: 60)",
     )
     parser.add_argument("--json", action="store_true", help="Emit machine-readable JSON summary")
+    parser.add_argument(
+        "--auto-repair-mcp",
+        action="store_true",
+        help="Create or repair the RecallOS entry in ~/.warp/.mcp.json before health checks",
+    )
     args = parser.parse_args()
 
     summary: dict[str, Any] = {"checks": [], "overall": PASS}
     hard_fail = False
 
     mcp_path = Path.home() / ".warp" / ".mcp.json"
+    if args.auto_repair_mcp:
+        try:
+            repaired, repair_detail = _repair_warp_mcp_config(mcp_path, sys.executable)
+            repair_status = WARN if repaired else PASS
+            _line(repair_status, "MCP auto-repair", repair_detail)
+            summary["checks"].append(
+                {"name": "mcp_auto_repair", "status": repair_status, "detail": repair_detail}
+            )
+        except Exception as exc:
+            _line(FAIL, "MCP auto-repair", str(exc))
+            summary["checks"].append(
+                {"name": "mcp_auto_repair", "status": FAIL, "detail": str(exc)}
+            )
+            hard_fail = True
+
+    if hard_fail:
+        summary["overall"] = FAIL
+        if args.json:
+            print(json.dumps(summary, indent=2))
+        return 1
     if not mcp_path.exists():
         _line(FAIL, "Warp MCP config", f"Missing file: {mcp_path}")
         summary["checks"].append(
@@ -269,9 +401,9 @@ def main() -> int:
     try:
         mcp_config = _load_json_file(mcp_path)
         server_map = _recognized_server_map(mcp_config)
-        server = server_map.get("recallos")
+        server = server_map.get(RECALLOS_SERVER_NAME)
         if not isinstance(server, dict):
-            raise ValueError("No 'recallos' entry found")
+            raise ValueError(f"No '{RECALLOS_SERVER_NAME}' entry found")
         _line(PASS, "Warp MCP config", f"Loaded recallos server from {mcp_path}")
         summary["checks"].append(
             {"name": "warp_mcp_config", "status": PASS, "detail": f"{mcp_path}"}
