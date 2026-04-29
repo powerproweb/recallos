@@ -279,6 +279,26 @@ Startup usage:
 - `scripts/recallos_profile_startup_hook.ps1` runs this check with `--auto-repair-mcp`.
 - The same invocation is mirrored in the shell profile to keep RecallOS MCP connected each session.
 
+### Daily startup process
+1. **Hard rule:** never use PowerShell for RecallOS operations.
+2. Use **Ubuntu 24.04 (WSL)** in Warp and run commands in `bash` only.
+3. Run the startup verification command at session start:
+
+```bash
+python scripts/check_recallos_health.py --timeout 60 --json --auto-repair-mcp
+```
+
+4. If output is PASS, RecallOS MCP is connected and ready.
+5. If output is FAIL, inspect the startup log and fix the reported issue before working.
+6. If you want to re-verify manually at any time, run:
+
+```bash
+python scripts/check_recallos_health.py --timeout 60 --json --auto-repair-mcp
+```
+
+Startup log path:
+- `~/.recallos/logs/startup-health-check.log`
+
 ---
 
 ## Benchmarks
