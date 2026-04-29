@@ -135,9 +135,7 @@ def _canonicalize_recallos_server(
     return server
 
 
-def _repair_warp_mcp_config(
-    mcp_path: Path, fallback_python_command: str
-) -> tuple[bool, str]:
+def _repair_warp_mcp_config(mcp_path: Path, fallback_python_command: str) -> tuple[bool, str]:
     existed_before = mcp_path.exists()
     repair_notes: list[str] = []
 
@@ -208,7 +206,11 @@ def _check_vault(vault_path: str, collection_name: str) -> tuple[bool, dict[str,
             "sample_metadata_keys": sample_keys,
         }
     except Exception as exc:
-        return False, {"error": str(exc), "vault_path": vault_path, "collection_name": collection_name}
+        return False, {
+            "error": str(exc),
+            "vault_path": vault_path,
+            "collection_name": collection_name,
+        }
 
 
 def _build_mcp_env(server: dict[str, Any]) -> dict[str, str]:
@@ -305,18 +307,8 @@ def _run_mcp_roundtrip(
             "tool_names": tool_names,
         }
 
-    status_text = (
-        responses[3]
-        .get("result", {})
-        .get("content", [{}])[0]
-        .get("text", "")
-    )
-    query_text = (
-        responses[4]
-        .get("result", {})
-        .get("content", [{}])[0]
-        .get("text", "")
-    )
+    status_text = responses[3].get("result", {}).get("content", [{}])[0].get("text", "")
+    query_text = responses[4].get("result", {}).get("content", [{}])[0].get("text", "")
 
     try:
         status_obj = json.loads(status_text) if status_text else {}
@@ -422,7 +414,11 @@ def main() -> int:
     if not isinstance(command, str) or not command.strip():
         _line(FAIL, "MCP command", "recallos server has no valid command")
         summary["checks"].append(
-            {"name": "mcp_command", "status": FAIL, "detail": "recallos server has no valid command"}
+            {
+                "name": "mcp_command",
+                "status": FAIL,
+                "detail": "recallos server has no valid command",
+            }
         )
         hard_fail = True
     elif not isinstance(cmd_args, list) or not all(isinstance(a, str) for a in cmd_args):
@@ -480,7 +476,9 @@ def main() -> int:
                     f"query_hits={mcp_detail.get('query_hits')}"
                 ),
             )
-            summary["checks"].append({"name": "mcp_roundtrip", "status": PASS, "detail": mcp_detail})
+            summary["checks"].append(
+                {"name": "mcp_roundtrip", "status": PASS, "detail": mcp_detail}
+            )
 
             direct_count = vault_detail.get("count")
             status_count = mcp_detail.get("status_total_records")
@@ -515,7 +513,9 @@ def main() -> int:
                 )
         else:
             _line(FAIL, "MCP round-trip", mcp_detail.get("error", "unknown error"))
-            summary["checks"].append({"name": "mcp_roundtrip", "status": FAIL, "detail": mcp_detail})
+            summary["checks"].append(
+                {"name": "mcp_roundtrip", "status": FAIL, "detail": mcp_detail}
+            )
             hard_fail = True
 
     summary["overall"] = FAIL if hard_fail else PASS
