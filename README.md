@@ -278,6 +278,8 @@ python scripts/check_recallos_health.py --auto-repair-mcp --json
 Startup usage:
 - `scripts/recallos_profile_startup_hook.ps1` runs this check with `--auto-repair-mcp`.
 - The same invocation is mirrored in the shell profile to keep RecallOS MCP connected each session.
+- Startup log writes now use a named mutex (`Local\RecallOS_StartupHealthLog_Write`) to prevent concurrent session collisions.
+- If the lock cannot be acquired within 3 seconds, output is written to `~/.recallos/logs/startup-health-check.<PID>.log` and a warning is emitted.
 
 ### Daily startup process
 1. **Hard rule:** never use PowerShell for RecallOS operations.
